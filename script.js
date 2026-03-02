@@ -295,18 +295,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
     fetchProjects();
 
-    // ==================== CONTACT FORM ====================
+    // ==================== CONTACT FORM (Formspree) ====================
+    const FORMSPREE_ID = 'meelbedz';
     const contactForm = document.getElementById('contact-form');
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = contactForm.querySelector('.btn-submit');
         const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<span>Message envoye !</span>';
-        btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+
+        // Disable button during submission
+        btn.disabled = true;
+        btn.innerHTML = '<span>Envoi en cours...</span>';
+
+        try {
+            const formData = new FormData(contactForm);
+            const response = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
+                method: 'POST',
+                body: formData,
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.ok) {
+                btn.innerHTML = '<span>Message envoye avec succes !</span>';
+                btn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                contactForm.reset();
+            } else {
+                throw new Error('Erreur serveur');
+            }
+        } catch (err) {
+            btn.innerHTML = '<span>Erreur, reessayez</span>';
+            btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+        }
+
         setTimeout(() => {
             btn.innerHTML = originalHTML;
             btn.style.background = '';
-            contactForm.reset();
+            btn.disabled = false;
         }, 3000);
     });
 

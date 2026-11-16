@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette voyage étudiant</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Clickable prototype of the CEIHM mockup: one screen stage + flow strip, hotspots taken from the Figma frames (1334×750) */
+:root{--bg:#f3f1ee;--paper:#fff;--ink:#1d2230;--muted:#5d6577;--line:#ddd8d1;--coral:#ff6b4a;--body:"Instrument Sans",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 14px/1.4 var(--body);display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 6px;flex-wrap:wrap}
+.bar h1{font-size:15px;font-weight:600;margin:0}
+.bar h1 span{color:var(--muted);font-weight:500}
+.tools{display:flex;gap:6px;align-items:center}
+.pill{border:1px solid var(--line);background:var(--paper);border-radius:99px;padding:6px 12px;min-height:36px;font-size:13px;font-weight:500}
+.pill[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.stagewrap{display:grid;place-items:center;padding:6px 14px;min-height:0}
+.stage{position:relative;aspect-ratio:1334/750;width:min(100%,calc((100vh - 170px) * 1334 / 750));max-width:100%;background:var(--paper);border-radius:10px;box-shadow:0 20px 50px -24px rgba(29,34,48,.35);overflow:hidden}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block;transition:opacity .18s}
+.hs{position:absolute;border:0;padding:0;background:transparent;border-radius:8px}
+.hs:hover{background:rgba(255,107,74,.10);box-shadow:0 0 0 2px rgba(255,107,74,.55)}
+.show .hs,.flash .hs{background:rgba(255,107,74,.16);box-shadow:0 0 0 2px var(--coral)}
+.flash .hs{animation:fl .7s ease-out}
+@keyframes fl{0%{opacity:1}100%{opacity:0}}
+.missing{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:24px;color:var(--muted)}
+.strip{display:flex;gap:8px;overflow-x:auto;padding:8px 14px 12px;scrollbar-width:thin}
+.th{flex:0 0 auto;width:132px;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:4px;text-align:left}
+.th img{width:100%;aspect-ratio:1334/750;object-fit:cover;border-radius:5px;display:block;background:var(--bg)}
+.th span{display:block;font-size:11.5px;line-height:1.25;margin-top:4px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.th[aria-current="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.th[aria-current="true"] span{color:var(--ink);font-weight:600}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>Prototype cliquable <span id="where"></span></h1>
+  <div class="tools">
+    <button class="pill" type="button" id="hsBtn" aria-pressed="false">Montrer les zones cliquables</button>
+    <button class="pill" type="button" id="restart">Recommencer</button>
+  </div>
+</div>
+<div class="stagewrap"><div class="stage" id="stage" aria-live="polite"></div></div>
+<nav class="strip" id="strip" aria-label="Écrans de la maquette"></nav>
+<script>
+// Screens and hotspots read from the Figma file (frame coordinates, 1334×750).
+const W=1334,H=750;
+const S={
+ 1:{n:"1. Renseigner ses critères",h:[[1023,680,310,62,2]]},
+ 2:{n:"2. Choix du mode de destination",h:[[73,545,389,54,3],[764,545,389,54,6],[1193,133,78,24,1]]},
+ 3:{n:"3. Saisir la destination",h:[[878,678,420,54,4],[34,685,157,40,2],[1193,133,78,24,1]]},
+ 4:{n:"4. Fiche destination disponible",h:[[909,641,388,54,9],[57,641,388,54,2],[1193,133,78,24,1]]},
+ 5:{n:"5. Fiche destination indisponible",h:[[57,641,388,54,2],[1193,133,78,24,1]]},
+ 6:{n:"6. Inspirez-moi",h:[[892,675,420,50,7],[24,707,158,39,2],[1193,133,78,24,1]]},
+ 7:{n:"7. Inspirations pour vous",h:[[222,620,184,43,8],[643,620,184,43,8],[1090,620,184,43,8],[24,707,158,39,6],[929,281,190,24,6],[1193,133,78,24,1]]},
+ 8:{n:"8. Fiche inspiration",h:[[961,681,345,64,9],[9,690,305,46,7],[1193,133,78,24,1]]},
+ 9:{n:"9. Paiement",h:[[1040,673,238,42,10],[24,693,183,40,4]]},
+ 10:{n:"10. Paiement confirmé",h:[]},
+ 11:{n:"11. Paiement refusé",h:[[1040,673,238,42,10],[24,693,183,40,4]]}
+};
+const ORDER=[1,2,3,4,5,6,7,8,9,10,11];
+const src=i=>`${String(i).padStart(2,"0")}.png`;
+let cur=1,hist=[];const stage=document.getElementById("stage"),strip=document.getElementById("strip");
+function pct(v,t){return (v/t*100)+"%"}
+function go(i,push=true){if(push&&i!==cur)hist.push(cur);cur=i;render()}
+function render(){const s=S[cur];
+ stage.innerHTML=`<img src="${src(cur)}" alt="Écran ${s.n}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'missing',textContent:'Image de l\\'écran à exporter depuis Figma'}))">`+
+  s.h.map(([x,y,w,h,to])=>`<button class="hs" type="button" style="left:${pct(x,W)};top:${pct(y,H)};width:${pct(w,W)};height:${pct(h,H)}" data-to="${to}" aria-label="Aller à ${S[to].n}"></button>`).join("")+
+  `<button class="hs" type="button" style="left:${pct(8,W)};top:${pct(8,H)};width:${pct(25,W)};height:${pct(31,H)}" data-back="1" aria-label="Écran précédent"></button>`;
+ document.getElementById("where").textContent="· "+s.n;
+ strip.querySelectorAll(".th").forEach(b=>b.setAttribute("aria-current",String(+b.dataset.i===cur)));
+ const a=strip.querySelector(`[data-i="${cur}"]`);a&&a.scrollIntoView({block:"nearest",inline:"nearest"})}
+strip.innerHTML=ORDER.map(i=>`<button class="th" type="button" data-i="${i}"><img src="${src(i)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'"><span>${S[i].n}</span></button>`).join("");
+strip.addEventListener("click",e=>{const b=e.target.closest(".th");if(b)go(+b.dataset.i)});
+stage.addEventListener("click",e=>{const b=e.target.closest(".hs");
+ if(!b){stage.classList.remove("flash");void stage.offsetWidth;stage.classList.add("flash");return}
+ if(b.dataset.back){if(hist.length)go(hist.pop(),false);return}
+ go(+b.dataset.to)});
+document.getElementById("hsBtn").onclick=e=>{const on=e.currentTarget.getAttribute("aria-pressed")!=="true";e.currentTarget.setAttribute("aria-pressed",on);stage.classList.toggle("show",on)};
+document.getElementById("restart").onclick=()=>{hist=[];go(1,false)};
+addEventListener("keydown",e=>{const k=ORDER.indexOf(cur);if(e.key==="ArrowRight"&&k<ORDER.length-1)go(ORDER[k+1]);if(e.key==="ArrowLeft"&&k>0)go(ORDER[k-1])});
+render();
+</script>
+</body>
+</html>

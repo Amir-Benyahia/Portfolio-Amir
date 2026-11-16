@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Room Guide AR · soutenance</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Slide viewer for the Salle IHM soutenance (slides exported from the team's deck, 16:9) */
+:root{--bg:#f3f1ee;--paper:#fff;--ink:#1d2230;--muted:#5d6577;--line:#ddd8d1;--coral:#ff6b4a;--body:"Instrument Sans",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 14px/1.4 var(--body);display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 6px;flex-wrap:wrap}
+.bar h1{font-size:15px;font-weight:600;margin:0}
+.bar h1 span{color:var(--muted);font-weight:500}
+.tools{display:flex;gap:6px;align-items:center;font-variant-numeric:tabular-nums;color:var(--muted)}
+.pill{border:1px solid var(--line);background:var(--paper);border-radius:99px;min-width:40px;min-height:36px;padding:6px 12px;font-size:14px;font-weight:600;color:var(--ink)}
+.pill:disabled{opacity:.35;cursor:default}
+.stagewrap{display:grid;place-items:center;padding:6px 14px;min-height:0}
+.stage{position:relative;aspect-ratio:16/9;width:min(100%,calc((100vh - 170px) * 16 / 9));max-width:100%;background:var(--paper);border-radius:10px;box-shadow:0 20px 50px -24px rgba(29,34,48,.35);overflow:hidden}
+.stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.stage .nav{position:absolute;top:0;bottom:0;width:30%;border:0;background:transparent}
+.stage .prev{left:0;cursor:w-resize}.stage .next{right:0;cursor:e-resize}
+.strip{display:flex;gap:8px;overflow-x:auto;padding:8px 14px 12px;scrollbar-width:thin}
+.th{flex:0 0 auto;width:132px;border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:4px;text-align:left}
+.th img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:5px;display:block;background:var(--bg)}
+.th span{display:block;font-size:11.5px;line-height:1.25;margin-top:4px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.th[aria-current="true"]{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink)}
+.th[aria-current="true"] span{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<div class="bar">
+  <h1>Soutenance Salle IHM <span id="where"></span></h1>
+  <div class="tools"><button class="pill" type="button" id="p" aria-label="Diapositive précédente">←</button><span id="n"></span><button class="pill" type="button" id="nx" aria-label="Diapositive suivante">→</button></div>
+</div>
+<div class="stagewrap"><div class="stage"><img id="img" alt=""><button class="nav prev" type="button" aria-label="Précédente" tabindex="-1"></button><button class="nav next" type="button" aria-label="Suivante" tabindex="-1"></button></div></div>
+<nav class="strip" id="strip" aria-label="Diapositives"></nav>
+<script>
+const T=["Titre","Sommaire","Le projet","Le projecteur reconnu","Architecture","Boucle 1 · reconnaissance visuelle","Boucle 1 · les 8 étapes","Boucle 1 · sélection tactile en AR","Boucle 2 · dialogue vocal","Boucle 2 · les 8 étapes","Boucle 3 · mur animé","Fusion et fission","Accessibilité","Exemple orthophoniste","Références et IA"];
+const src=i=>String(i+1).padStart(2,"0")+".jpg";let cur=0;const $=id=>document.getElementById(id),strip=$("strip");
+strip.innerHTML=T.map((t,i)=>`<button class="th" type="button" data-i="${i}"><img src="${src(i)}" alt="" loading="lazy"><span>${i+1}. ${t}</span></button>`).join("");
+function go(i){cur=Math.max(0,Math.min(T.length-1,i));$("img").src=src(cur);$("img").alt="Diapositive "+(cur+1)+" : "+T[cur];$("where").textContent="· "+T[cur];$("n").textContent=(cur+1)+" / "+T.length;
+ $("p").disabled=cur===0;$("nx").disabled=cur===T.length-1;strip.querySelectorAll(".th").forEach(b=>b.setAttribute("aria-current",String(+b.dataset.i===cur)));
+ strip.querySelector(`[data-i="${cur}"]`).scrollIntoView({block:"nearest",inline:"nearest"});if(cur<T.length-1)new Image().src=src(cur+1)}
+strip.onclick=e=>{const b=e.target.closest(".th");if(b)go(+b.dataset.i)};
+$("p").onclick=document.querySelector(".prev").onclick=()=>go(cur-1);$("nx").onclick=document.querySelector(".next").onclick=()=>go(cur+1);
+addEventListener("keydown",e=>{if(e.key==="ArrowRight")go(cur+1);if(e.key==="ArrowLeft")go(cur-1)});
+go(0);
+</script>
+</body>
+</html>

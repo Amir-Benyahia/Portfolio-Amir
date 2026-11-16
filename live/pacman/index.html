@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pac-Man Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+/* Portfolio shell around the TER client modules (js/ copied unchanged from src/client/js) */
+:root{--bg:#f3f1ee;--paper:#fff;--ink:#1d2230;--muted:#5d6577;--line:#ddd8d1;--coral:#ff6b4a;--board:#040404;--body:"Instrument Sans",system-ui,sans-serif}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:400 14px/1.45 var(--body);display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;padding:14px;overflow:hidden}
+button,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--coral);outline-offset:2px}
+.boardwrap{display:grid;place-items:center;min-height:0;min-width:0;background:var(--board);border-radius:10px;position:relative;overflow:hidden}
+canvas{display:block;max-width:100%;max-height:100%;image-rendering:pixelated}
+#game-canvas,#simulation-canvas{position:absolute;inset:0;margin:auto;width:auto;height:auto;max-width:calc(100% - 20px);max-height:calc(100% - 20px)}
+.side{display:flex;flex-direction:column;gap:14px;min-height:0;overflow:auto;padding-right:2px}
+h1{font-size:15px;font-weight:600;margin:0}
+.sub{color:var(--muted);font-size:12.5px;margin:2px 0 0}
+fieldset{border:0;margin:0;padding:0}
+legend{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;padding:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{border:1px solid var(--line);background:var(--paper);border-radius:99px;padding:6px 11px;min-height:34px;font-size:13px;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip:disabled{opacity:.4;cursor:not-allowed}
+.ghost{display:inline-flex;align-items:center;gap:6px}
+.ghost i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.go{border:0;background:var(--coral);color:#fff;border-radius:8px;padding:10px 14px;font-weight:600;min-height:40px;width:100%}
+.go.sec{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.hint{font-size:12.5px;color:var(--muted);margin:6px 0 0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.stat{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:6px 8px}
+.stat b{display:block;font-size:16px;font-variant-numeric:tabular-nums}
+.stat span{font-size:11px;color:var(--muted)}
+#result{min-height:20px;font-weight:600;font-size:13px}
+.pad{display:none;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,44px);gap:4px;justify-content:center}
+.pad button{border:1px solid var(--line);background:var(--paper);border-radius:8px;font-size:16px}
+.pad .u{grid-column:2}.pad .l{grid-column:1;grid-row:2}.pad .d{grid-column:2;grid-row:2}.pad .r{grid-column:3;grid-row:2}
+.cred{font-size:11.5px;color:var(--muted);margin-top:auto}
+@media (max-width:760px){body{grid-template-columns:1fr;grid-template-rows:minmax(240px,52vh) auto;overflow:auto;height:auto;min-height:100%}.side{overflow:visible}}
+@media (hover:none){.pad{display:grid}}
+</style>
+</head>
+<body>
+<div class="boardwrap">
+  <canvas id="game-canvas" hidden></canvas>
+  <canvas id="simulation-canvas"></canvas>
+</div>
+<aside class="side">
+  <div>
+    <h1>Pac-Man Lab</h1>
+    <p class="sub">Labyrinthes produits par notre générateur Python, fantômes et bots codés dans le client du projet.</p>
+  </div>
+  <fieldset>
+    <legend>1. Labyrinthe généré par</legend>
+    <div class="chips" id="mazes"></div>
+  </fieldset>
+  <fieldset>
+    <legend>2. Fantômes en jeu</legend>
+    <div class="chips" id="ghosts"></div>
+  </fieldset>
+  <fieldset>
+    <legend>3. Qui joue Pac-Man ?</legend>
+    <div class="chips" id="bots"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="go" id="run" type="button">Lancer</button>
+      <button class="go sec" id="reset" type="button">Réinitialiser</button>
+    </div>
+    <p class="hint" id="hint"></p>
+    <div class="pad" id="pad" aria-label="Flèches de direction">
+      <button class="u" data-k="ArrowUp" aria-label="Haut">↑</button><button class="l" data-k="ArrowLeft" aria-label="Gauche">←</button><button class="d" data-k="ArrowDown" aria-label="Bas">↓</button><button class="r" data-k="ArrowRight" aria-label="Droite">→</button>
+    </div>
+  </fieldset>
+  <div>
+    <div class="stats">
+      <div class="stat"><b id="sScore">0</b><span>score</span></div>
+      <div class="stat"><b id="sFrame">0</b><span>pas</span></div>
+      <div class="stat"><b id="sPel">0</b><span>pastilles</span></div>
+    </div>
+    <p id="result" aria-live="polite"></p>
+  </div>
+  <p class="cred">TER M1, 2025. Mon rôle : testeur de labyrinthes (connexité BFS, symétrie) et pont Express ↔ Python.</p>
+</aside>
+
+<script src="js/formatters.js"></script>
+<script src="js/performanceTracker.js"></script>
+<script src="js/MazeCanvas.js"></script>
+<script src="js/PacmanController.js"></script>
+<script src="js/InputHandler.js"></script>
+<script src="js/GameEngine.js"></script>
+<script src="js/SimulationViewer.js"></script>
+<script src="mazes.js"></script>
+<script>
+// Static shell: no Express/MongoDB here, the mazes were pre-generated with the Python CLI.
+// js/SimulationViewer.js: pellet encoding aligned on the grids (2/3 instead of 3/4), see its header.
+// Ghost step: shortest path (BFS, same result as the A* of the Python ghosts in src/algorithms/ghost_ai)
+// instead of the client's one-step greedy move, which left ghosts stuck behind walls.
+SimulationViewer.prototype.calculateMoveToTarget=function(from,target){
+ const g=this.grid,H=g.length,W=g[0].length,ok=(y,x)=>y>=0&&y<H&&x>=0&&x<W&&g[y][x]!==1;
+ let t={y:Math.max(0,Math.min(H-1,target.y)),x:Math.max(0,Math.min(W-1,target.x))};if(!ok(t.y,t.x))t=this.findNearestWalkable(t);
+ if(t.y===from.y&&t.x===from.x)return null;
+ const prev=new Map([[from.y*W+from.x,-1]]),q=[from.y*W+from.x];
+ for(let i=0;i<q.length;i++){const c=q[i],y=c/W|0,x=c%W;if(y===t.y&&x===t.x){let k=c;while(prev.get(k)!==from.y*W+from.x)k=prev.get(k);return{y:k/W|0,x:k%W}}
+  for(const[dy,dx]of[[-1,0],[1,0],[0,-1],[0,1]]){const ny=y+dy,nx=x+dx,n=ny*W+nx;if(ok(ny,nx)&&!prev.has(n)){prev.set(n,c);q.push(n)}}}
+ return null};
+// Spawn Pac-Man near the bottom centre instead of the first free cell (often a tunnel exit).
+const nearest=(g,ty,tx)=>{let best=null,bd=1e9;g.forEach((r,y)=>r.forEach((c,x)=>{if(c!==1&&x>0&&x<r.length-1){const d=Math.abs(y-ty)*1.2+Math.abs(x-tx);if(d<bd){bd=d;best={y,x}}}}));return best};
+GameEngine.prototype.findStartPosition=function(){return nearest(this.grid,this.grid.length-2,this.grid[0].length>>1)};
+console.log=()=>{};console.warn=()=>{};// the original modules log every frame
+Formatters.showToast=()=>{};// English toasts replaced by the result line below
+
+const ALG={kruskal:"Kruskal",prim:"Prim",recursive_backtracker:"Backtracking récursif",wilson:"Wilson"};
+const GH=[["blinky","Blinky","poursuit","#ff1744"],["pinky","Pinky","embuscade","#f50057"],["inky","Inky","coordonne","#00e5ff"],["clyde","Clyde","imprévisible","#ff9100"]];
+const BOTS=[["me","Moi (flèches)"],["greedy","Bot glouton"],["defensive","Bot prudent"],["aggressive","Bot agressif"],["random","Bot aléatoire"],["replay","Ma partie rejouée"]];
+let maze=0,ghostsOn=new Set(["blinky","pinky","inky"]),who="greedy",sim=null,game=null,myTraj=null,tick=null;
+const $=id=>document.getElementById(id),gc=$("game-canvas"),sc=$("simulation-canvas");
+const grid=()=>JSON.parse(JSON.stringify(MAZES[maze].grid));
+const total=()=>MAZES[maze].grid.flat().filter(c=>c===2||c===3).length;
+
+function chips(el,items,isOn,onClick){el.innerHTML=items.map(([v,l,s,c])=>`<button class="chip${c?" ghost":""}" type="button" data-v="${v}" aria-pressed="${isOn(v)}">${c?`<i style="background:${c}"></i>`:""}${l}${s?` <span style="opacity:.7;font-weight:400">${s}</span>`:""}</button>`).join("");
+ el.onclick=e=>{const b=e.target.closest(".chip");if(b&&!b.disabled){onClick(b.dataset.v);chips(el,items,isOn,onClick)}}}
+function drawChips(){
+ chips($("mazes"),MAZES.map((m,i)=>[String(i),ALG[m.algorithm]]),v=>+v===maze,v=>{maze=+v;myTraj=null;drawChips();reset()});
+ chips($("ghosts"),GH,v=>ghostsOn.has(v),v=>{ghostsOn.has(v)?ghostsOn.size>1&&ghostsOn.delete(v):ghostsOn.add(v);reset()});
+ chips($("bots"),BOTS,v=>v===who,v=>{who=v;reset()});
+ const rb=$("bots").querySelector('[data-v="replay"]');rb.disabled=!myTraj;rb.title=myTraj?"":"Joue d'abord une partie avec « Moi »";
+ $("hint").textContent=who==="me"?"Mange les pastilles aux flèches (ou ZQSD), sans fantômes : ta trajectoire est enregistrée. Ensuite, « Ma partie rejouée » lance les fantômes sur ton parcours, comme dans notre protocole de test."
+  :who==="replay"?"Les fantômes choisis rejouent contre ton parcours enregistré, pas à pas."
+  :"Le bot décide à chaque pas ; les fantômes calculent leur cible selon leur personnalité."}
+function ghostCfg(){const g=MAZES[maze].grid,c=nearest(g,g.length>>1,g[0].length>>1);return GH.filter(([t])=>ghostsOn.has(t)).map(([t])=>({type:t,algorithm:"astar",startPos:c}))}
+function stopAll(){if(sim){sim.pause();sim=null}if(game){game.stop();game=null}clearInterval(tick);$("result").textContent=""}
+function stats(score,frame,pel){$("sScore").textContent=score;$("sFrame").textContent=frame;$("sPel").textContent=pel+" / "+total()}
+function reset(){stopAll();gc.hidden=true;sc.hidden=false;$("run").textContent=who==="me"?"Jouer":"Lancer";
+ new MazeCanvas("simulation-canvas",grid()).render();
+ const tmp=new MazeCanvas("simulation-canvas",grid()),g=MAZES[maze].grid,p=nearest(g,g.length-2,g[0].length>>1);tmp.render();tmp.drawPacman(p.y,p.x);
+ ghostCfg().forEach((c,i)=>tmp.drawGhost(c.startPos.y,c.startPos.x,c.type,i));stats(0,0,0);drawChips()}
+function end(r){clearInterval(tick);const s=sim;if(!s)return;stats(s.score,s.currentFrame,total()-s.remainingPellets);
+ $("result").textContent=r.caught?`Attrapé par ${r.caughtByGhost[0].toUpperCase()+r.caughtByGhost.slice(1)} au pas ${s.currentFrame}.`:s.remainingPellets<=0?"Toutes les pastilles mangées.":"Fin de la partie sans capture."}
+function run(){stopAll();
+ if(who==="me"){gc.hidden=false;sc.hidden=true;game=new GameEngine("game-canvas",grid(),MAZES[maze].algorithm);game.start();$("run").textContent="Terminer ma partie";
+  gc.focus?.();tick=setInterval(()=>{if(!game)return;stats(game.pacman.getPelletsEaten()*10,game.trajectory.length,game.pacman.getPelletsEaten());if(!game.isRunning)finish()},200);return}
+ const g=grid();let traj,bot=who!=="replay";
+ if(bot){const p=nearest(g,g.length-2,g[0].length>>1);traj=[{y:p.y,x:p.x,timestamp:Date.now()}]}else traj=myTraj;
+ sim=new SimulationViewer("simulation-canvas",g,traj,ghostCfg(),bot,bot?who:null,60000);sim.onSimulationComplete=end;sim.play();
+ tick=setInterval(()=>{if(sim)stats(sim.score,sim.currentFrame,total()-sim.remainingPellets)},150)}
+function finish(){clearInterval(tick);if(!game)return;game.stop();const t=game.getTrajectory();
+ if(t.length>3){myTraj=t;who="replay";game=null;drawChips();$("result").textContent=`Partie enregistrée : ${t.length} pas. Lance « Ma partie rejouée » pour voir les fantômes.`;$("run").textContent="Lancer"}else{game=null;$("result").textContent="Trop court pour être rejoué, déplace-toi un peu plus."}}
+$("run").onclick=()=>{if(game&&game.isRunning){finish();return}run()};
+$("reset").onclick=reset;
+$("pad").addEventListener("pointerdown",e=>{const b=e.target.closest("button");if(b){e.preventDefault();document.dispatchEvent(new KeyboardEvent("keydown",{key:b.dataset.k,bubbles:true}))}});
+reset();
+</script>
+</body>
+</html>

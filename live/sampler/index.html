@@ -1020,7 +1020,7 @@
       loadMyRecordings();
       
       // Initialisation du support MIDI (optionnel mais souhaite)
-      initMIDI();
+      // initMIDI(); désactivé dans la copie portfolio (évite la demande d autorisation MIDI)
 
       document.querySelector("#vol").oninput = (e) => sampler.masterGain.gain.value = parseFloat(e.target.value);
       document.querySelector("#stopAllBtn").onclick = () => { sampler.stopAll(); playheadX = null; };

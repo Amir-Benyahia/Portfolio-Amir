@@ -144,8 +144,11 @@ let RUNS={};try{RUNS=JSON.parse(sessionStorage.getItem("abonnix-runs")||"{}")}ca
 window.RUNS=()=>RUNS;
 
 function askSEQ(run){const r=$("replay");r.hidden=false;r.innerHTML=`<div class="seq"><h2>Dans l'ensemble, cette tâche était…</h2><div class="seqrow">${[1,2,3,4,5,6,7].map(n=>`<button type="button" data-n="${n}">${n}</button>`).join("")}</div><div class="seqlab"><span>très difficile</span><span>très facile</span></div></div>`;
- r.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{run.seq=+b.dataset.n;Sessions.add(run);showReplay(run)});r.scrollIntoView({behavior:"smooth",block:"start"})}
+ r.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{run.seq=+b.dataset.n;Sessions.add(run);testDone(run)});r.scrollIntoView({behavior:"smooth",block:"start"})}
 
+function testDone(run){const r=$("replay"),other=run.ver==="dark"?"fair":"dark";
+ r.innerHTML=`<div class="seq"><h2>Merci, passage enregistré.</h2><p class="sub">Laissez l'animateur·rice reprendre la main.</p><div class="seqrow" style="justify-content:center;flex-wrap:wrap"><button type="button" id="tNext">Passer à l'autre version</button><button type="button" id="tRep">Voir le replay (après la séance)</button></div></div>`;
+ $("tNext").onclick=()=>{start(other);$("browser").scrollIntoView({block:"start"})};$("tRep").onclick=()=>showReplay(run)}
 const OUT={cancelled:["Résilié","ok"],paused:["Piégé : compte en pause, pas résilié","bad"],abandoned:["Abandon","bad"]};
 function showReplay(run){const r=$("replay");r.hidden=false;const [ol,oc]=OUT[run.outcome];
  const pats=[...new Set([...run.seen])].filter(p=>PATTERNS[p]).sort((a,b)=>(run.caught.includes(b)-run.caught.includes(a)));
@@ -164,11 +167,11 @@ function compare(d,f){if(!d||!f)return"";const mx=Math.max(d.time,f.time,1),mc=M
  return `<div class="cmp"><h3>Vos deux passages</h3>${bar(d.time,mx,"d","Actuelle, temps")}${bar(f.time,mx,"f","Conforme, temps")}${bar(d.clicks,mc,"d","Actuelle, clics")}${bar(f.clicks,mc,"f","Conforme, clics")}</div>`}
 
 function start(v){if(st){clearInterval(st.timer);clearInterval(st.cdTimer)}ver=v;st=fresh(v);$("replay").hidden=true;$("giveUp").disabled=false;
- $("verTag").textContent=v==="dark"?"version actuelle":"version conforme";$("browser").dataset.ver=v;
+ $("verTag").textContent=TEST?(v==="dark"?"version A":"version B"):(v==="dark"?"version actuelle":"version conforme");$("browser").dataset.ver=v;
  $("mKicker").textContent=v==="dark"?"Mission":"Mission, version conforme";
  $("mTitle").textContent=v==="dark"?"Vous êtes abonné·e à Abonnix. Résiliez votre abonnement.":"Même mission, avec un parcours conforme.";
  tick();render();if(v==="fair")$("browser").scrollIntoView({behavior:"smooth",block:"start"})}
 $("giveUp").onclick=()=>{if(st&&!st.outcome){if(!st.running){st.t0=performance.now()}end("abandoned")}};
 window.Flow={start,runs:()=>RUNS,TEST};
-start("dark");
+start(TEST&&/[?&]v=fair\b/.test(location.search)?"fair":"dark");
 })();

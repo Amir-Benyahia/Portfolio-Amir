@@ -375,7 +375,7 @@ function buildLap() {
     const c = document.createElement("canvas"); c.width = 256; c.height = 32; const g = c.getContext("2d");
     for (let x = 0; x < 16; x++) for (let y = 0; y < 2; y++) { g.fillStyle = (x + y) % 2 ? "#1c1d1f" : "#f6f6f2"; g.fillRect(x * 16, y * 16, 16, 16); }
     const m = new THREE.Mesh(new THREE.PlaneGeometry(HW * 2, 1.6), new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(c), roughness: 0.8 }));
-    m.rotation.x = -Math.PI / 2; m.rotation.z = Math.atan2(tans[0].x, tans[0].z) + Math.PI / 2;
+    m.rotation.x = -Math.PI / 2; m.rotation.z = Math.atan2(tans[0].x, tans[0].z);
     m.position.set(pts[0].x, 0.04, pts[0].z); m.receiveShadow = true; scene.add(m);
   }
 
@@ -453,7 +453,7 @@ function buildLap() {
   const car = buildCar(); scene.add(car);
   const shadowBlob = contactShadow(3.6, 7.4, 0.5); car.add(shadowBlob);
 
-  const comp = coarse ? null : composerFor(r, scene, cam, { radius: 2.5, intensity: 0.9, thickness: 2 });
+  const comp = coarse || new URLSearchParams(location.search).has("noao") ? null : composerFor(r, scene, cam, { radius: 2.5, intensity: 0.9, thickness: 2 });
   lap = { r, scene, cam, sun, car, curve, pts, tans, nrm, curv, N, LEN, gS, gIds, host, comp, sky };
   const resize = () => { const w = host.clientWidth, h = host.clientHeight; r.setSize(w, h, false); comp && comp.setSize(w, h); cam.aspect = w / h; cam.updateProjectionMatrix(); };
   new ResizeObserver(resize).observe(host); resize();

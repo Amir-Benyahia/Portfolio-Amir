@@ -3,314 +3,100 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Amir Benyahia · UX research & design</title>
-<meta name="description" content="Portfolio d'Amir Benyahia, M2 IHM : un labo UX en 3D à explorer, des projets à essayer en direct, et un test d'utilisabilité dont vous êtes le participant. Stage de 6 mois dès le 1er mars 2027, Côte d'Azur.">
-<meta property="og:title" content="Amir Benyahia · UX research & design">
-<meta property="og:description" content="Un labo UX en 3D à explorer, avec des projets à essayer en direct.">
-<meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500;600&display=swap">
-<style>
-/* Layout: full-screen light 3D diorama; giant name top-left, small controls top-right, case study opens in a side sheet; a text view mirrors everything for accessibility */
-:root{--bg:#e9edf1;--paper:#ffffff;--ink:#1d2230;--muted:#5d6577;--line:#d3d9e1;--coral:#ff6b4a;--sage:#9cc7a4;--butter:#ffd97a;--lilac:#b9a8ff;--sky:#8cc4ff;
---display:"Big Shoulders Display",Impact,sans-serif;--body:"Instrument Sans",system-ui,sans-serif;color-scheme:light}
-*{box-sizing:border-box}
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 var(--body);overflow:hidden}
-#scene{position:fixed;inset:0;width:100%;height:100%;display:block;outline:none}
-button{font:inherit;color:inherit;cursor:pointer}
-:focus-visible{outline:2px solid var(--coral);outline-offset:3px}
-.name{position:fixed;left:max(20px,env(safe-area-inset-left,0px));top:calc(14px + env(safe-area-inset-top,0px));z-index:5;pointer-events:none;margin:0}
-.name h1{font:900 clamp(56px,11vw,168px)/.82 var(--display);letter-spacing:-.01em;text-transform:uppercase;margin:0}
-.name p{margin:10px 0 0;font-weight:500;max-width:34ch;color:var(--muted)}
-.ui{position:fixed;right:max(16px,env(safe-area-inset-right,0px));top:calc(16px + env(safe-area-inset-top,0px));z-index:6;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
-.seg{display:flex;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:3px;gap:2px}
-.seg button{border:0;background:transparent;border-radius:99px;padding:8px 13px;min-height:40px;font-size:14px;font-weight:500;color:var(--muted)}
-.seg button[aria-pressed="true"]{background:var(--ink);color:#fff}
-.lbl{font-size:12.5px;color:var(--muted);margin-right:4px}
-.pill{border:1px solid var(--line);background:var(--paper);border-radius:99px;padding:9px 15px;min-height:40px;font-size:14px;font-weight:500}
-.pill.rec{background:var(--coral);border-color:var(--coral);color:#fff}
-.hint{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:5;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:9px 16px;font-size:14px;color:var(--muted);white-space:nowrap;max-width:calc(100vw - 32px);overflow:hidden;text-overflow:ellipsis}
-.hint b{color:var(--ink)}
-.hint.rec{border-color:var(--coral);color:var(--ink)}
-.hint.rec::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--coral);margin-right:8px;animation:bl 1.2s infinite}
-@keyframes bl{50%{opacity:.3}}
-.tip{position:fixed;z-index:7;pointer-events:none;background:var(--ink);color:#fff;font-size:13.5px;font-weight:500;padding:6px 10px;border-radius:8px;transform:translate(-50%,-140%);white-space:nowrap}
-.sheet{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);background:var(--paper);z-index:20;box-shadow:-30px 0 60px -30px rgba(29,34,48,.35);transform:translateX(105%);transition:transform .35s cubic-bezier(.2,.8,.2,1);overflow:auto;padding:calc(22px + env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) calc(28px + env(safe-area-inset-bottom,0px)) 26px}
-.sheet.open{transform:none}
-.sheet.wide{width:min(1240px,calc(100vw - 24px));padding:0;display:grid;grid-template-columns:minmax(0,1fr) 360px;overflow:hidden}
-.sheet.wide .txt{overflow:auto;padding:calc(22px + env(safe-area-inset-top,0px)) max(24px,env(safe-area-inset-right,0px)) 28px 26px}
-.live{display:flex;flex-direction:column;min-height:0;background:var(--bg);border-right:1px solid var(--line)}
-.livebar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;font-size:14px;font-weight:500;color:var(--muted)}
-.livebar b{color:var(--ink);font-weight:600}.livebar b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#2fbf71;margin-right:8px;vertical-align:1px}
-.livebar a{color:var(--ink)}
-.frame{position:relative;flex:1;min-height:0;margin:0 12px 12px;border-radius:12px;overflow:hidden;background:#fff;border:1px solid var(--line)}
-.frame iframe{position:absolute;left:0;top:0;width:100%;height:100%;border:0;background:#fff;transform-origin:0 0}
-.sheet:focus{outline:none}
-.figcard{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:32px;background:linear-gradient(160deg,#fff 0%,#fff4ef 100%)}
-.figcard h3{font:900 clamp(34px,4vw,52px)/.9 var(--display);text-transform:uppercase;margin:0}
-.figcard p{margin:0;max-width:44ch;color:var(--muted)}
-.figcard a{align-self:flex-start;background:var(--ink);color:#fff;text-decoration:none;border-radius:99px;padding:11px 18px;font-weight:500;min-height:44px;display:inline-flex;align-items:center}
-.frame .ld{position:absolute;inset:0;display:grid;place-items:center;color:var(--muted);font-size:14px}
-.sheet .note2{font-size:13.5px;color:var(--muted)}
-.livebar .mclose{display:none}
-@media (max-width:900px){.livebar .mclose{display:inline-flex}.livebar{flex-wrap:wrap}.sheet.wide{width:100vw;grid-template-columns:1fr;grid-template-rows:62vh auto;overflow:auto}.sheet.wide .txt{overflow:visible}.live{border-right:0}}
-.sheet .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.sheet .yr{font-size:13px;color:var(--muted);font-weight:500}
-.sheet h2{font:900 46px/.9 var(--display);text-transform:uppercase;margin:16px 0 12px;text-wrap:balance}
-.sheet .lead{font-size:17px;margin:0 0 14px}
-.sheet ul{padding-left:18px;margin:0 0 14px;display:flex;flex-direction:column;gap:6px}
-.sheet p{margin:0 0 12px}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 16px}
-.tags span{font-size:12.5px;font-weight:500;background:var(--bg);border-radius:99px;padding:4px 10px}
-.swatch{height:6px;border-radius:3px;margin-top:6px}
-.textview{position:fixed;inset:0;z-index:30;background:var(--bg);overflow:auto;display:none;padding:calc(24px + env(safe-area-inset-top,0px)) max(20px,env(safe-area-inset-right,0px)) 40px max(20px,env(safe-area-inset-left,0px))}
-.textview.open{display:block}
-.textview .wrap{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-.textview h2{font:900 clamp(48px,9vw,96px)/.85 var(--display);text-transform:uppercase;margin:12px 0 4px}
-.textview article{background:var(--paper);border-radius:14px;padding:18px 20px}
-.textview h3{font:800 26px/1 var(--display);text-transform:uppercase;margin:4px 0 6px}
-.textview article p{margin:0;color:var(--muted)}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,170px),1fr));gap:8px}
-.facts div{background:var(--paper);border-radius:12px;padding:12px 14px}
-.facts span{font-size:13px;color:var(--muted)}.facts b{display:block}
-#heat{position:fixed;inset:0;width:100%;height:100%;z-index:8;pointer-events:none}
-.report{position:fixed;top:calc(16px + env(safe-area-inset-top,0px));right:max(16px,env(safe-area-inset-right,0px));max-height:calc(100vh - 32px);z-index:25;background:var(--paper);border-radius:18px;padding:24px;width:min(400px,calc(100vw - 32px));overflow:auto;box-shadow:0 40px 80px -30px rgba(29,34,48,.5)}
-@media (max-width:640px){.report{top:auto;bottom:calc(12px + env(safe-area-inset-bottom,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));width:auto;max-height:58vh}}
-.report h2{font:900 40px/.9 var(--display);text-transform:uppercase;margin:4px 0 12px}
-.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0 12px}
-.kpis div{background:var(--bg);border-radius:10px;padding:10px;text-align:center}
-.kpis b{display:block;font:900 30px/1 var(--display)}
-.kpis span{font-size:12.5px;color:var(--muted)}
-.report p{margin:0 0 10px;font-size:15px}
-.note{color:var(--muted);font-size:13.5px}
-.seq{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.seq button{min-height:44px;border:1px solid var(--line);background:var(--paper);border-radius:8px;font-weight:600}
-.seq button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
-.seqlbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin:4px 0 10px}
-.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.ok{color:#11804a;font-weight:600}
-.consent{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:25;background:var(--paper);border-radius:18px;padding:24px;width:min(440px,calc(100vw - 32px));box-shadow:0 40px 80px -30px rgba(29,34,48,.5)}
-.consent h2{font:900 40px/.9 var(--display);text-transform:uppercase;margin:0 0 12px}
-.legend{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);margin-bottom:10px}
-.legend i{flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#3b6cff,#00d0e0 30%,#47e07a 50%,#ffd84a 70%,#ff8a2a 85%,#ff3b3b)}
-@media (max-width:640px){.name p{display:none}.lbl{display:none}.ui{top:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:max(12px,env(safe-area-inset-left,0px));right:max(12px,env(safe-area-inset-right,0px));align-items:stretch}.ui>div{justify-content:center!important}.seg button,.pill{min-height:44px}.hint{top:calc(150px + env(safe-area-inset-top,0px));bottom:auto;font-size:13px}}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
+<title>Amir Benyahia, UX research &amp; design</title>
+<meta name="description" content="Amir Benyahia, étudiant en M2 IHM, cherche un stage UX de 6 mois à partir de mars 2027 sur la Côte d'Azur.">
+<meta property="og:title" content="Amir Benyahia, UX research &amp; design">
+<meta property="og:description" content="Six projets UX, de l'entretien au produit en ligne, à essayer en direct. Stage de 6 mois dès le 1er mars 2027, Côte d'Azur.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://amir-benyahia.github.io/Portfolio-Amir/">
+<link rel="canonical" href="https://amir-benyahia.github.io/Portfolio-Amir/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anybody:wdth,wght@50..150,300..900&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<link rel="stylesheet" href="style.css">
+<script>try{if(!sessionStorage.getItem("ab-intro")&&!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("intro")}catch(e){}</script>
 </head>
 <body>
+<a class="skip" href="#projets" data-i="skip">Aller directement aux projets</a>
 
-<canvas id="scene" tabindex="-1" aria-label="Scène 3D du labo"></canvas>
-<div class="name"><h1>Amir<br>Benyahia</h1><p id="sub"></p></div>
-<div class="ui">
-  <div class="seg" role="group" id="profSeg"></div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end">
-    <button class="pill" type="button" id="textBtn"></button>
-    <button class="pill rec" type="button" id="testBtn"></button>
-    <div class="seg"><button type="button" data-l="fr" id="l-fr">FR</button><button type="button" data-l="en" id="l-en">EN</button></div>
-  </div>
+<svg width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute">
+  <filter id="nblur" x="-30%" y="0" width="160%" height="100%"><feGaussianBlur id="nblurStd" in="SourceGraphic" stdDeviation="0 0"/></filter>
+  <filter id="mblur" x="-10%" y="0" width="120%" height="100%"><feGaussianBlur id="mblurStd" in="SourceGraphic" stdDeviation="0 0"/></filter>
+</svg>
+
+<header class="top">
+  <a class="mono" href="#accueil" aria-label="Amir Benyahia, retour en haut" data-i-aria="homeAria">AB</a>
+  <nav aria-label="Principale" data-i-aria="navLabel">
+    <a href="#projets" data-i="navProjects">Projets</a>
+    <a href="cv.pdf" target="_blank" rel="noopener" data-i="navCv">CV</a>
+    <a href="#contact" data-i="navContact">Contact</a>
+  </nav>
+  <button type="button" id="lang" class="pill" lang="en">English</button>
+</header>
+
+<main>
+  <section id="accueil" class="hero" aria-labelledby="name">
+    <div class="lights" aria-hidden="true"><i><b></b><b></b></i><i><b></b><b></b></i><i><b></b><b></b></i><i><b></b><b></b></i><i><b></b><b></b></i></div>
+    <h1 id="name" class="name"><span class="l1">Amir</span><span class="l2">Benyahia</span></h1>
+    <div class="track" aria-hidden="true"><span></span></div>
+    <div class="hero-grid">
+      <p class="claim" data-i="claim">Je conçois des interfaces qu'on comprend du premier coup.</p>
+      <div class="hero-side">
+        <p class="facts" data-i-html="facts">Étudiant en M2 IHM à l'Université Côte d'Azur. Je cherche un <strong>stage UX de 6 mois à partir du 1<sup>er</sup> mars 2027</strong>, à Nice ou Sophia Antipolis.</p>
+        <div class="ctas">
+          <a class="btn blue" href="#projets" data-i="ctaProjects">Voir les projets</a>
+          <a class="btn line" href="cv.pdf" target="_blank" rel="noopener" data-i="ctaCv">CV en PDF</a>
+        </div>
+      </div>
+    </div>
+    <button type="button" class="skip-intro" id="skipIntro" data-i="skipIntro">Passer l'intro</button>
+  </section>
+
+  <section id="projets" class="straight" aria-labelledby="h2p">
+    <div class="pin">
+      <div class="straight-head">
+        <p class="kicker grid-k" data-i="gridKicker">Grille de départ</p>
+        <h2 id="h2p" data-i="h2p">Six projets, de l'entretien au produit en ligne.</h2>
+        <div class="sectors" aria-hidden="true"><span><i></i><em>S1</em></span><span><i></i><em>S2</em></span><span><i></i><em>S3</em></span></div>
+        <p class="count" aria-hidden="true"><span id="cur">1</span>/6</p>
+      </div>
+      <ol class="rail" id="rail"></ol>
+    </div>
+  </section>
+
+  <section id="contact" class="parc" aria-labelledby="h2c">
+    <div class="chequer" aria-hidden="true"></div>
+    <p class="kicker" data-i="parcKicker">Parc fermé</p>
+    <h2 id="h2c" data-i="h2c">On en parle ?</h2>
+    <dl class="sheet-facts">
+      <div><dt data-i="fAvail">Disponible</dt><dd data-i="fAvailV">Du 1er mars au 31 août 2027</dd></div>
+      <div><dt data-i="fZone">Zone</dt><dd data-i="fZoneV">Côte d'Azur, véhiculé</dd></div>
+      <div><dt data-i="fSchool">Formation</dt><dd data-i="fSchoolV">M2 IHM, Université Côte d'Azur</dd></div>
+    </dl>
+    <div class="ctas">
+      <a class="btn blue" href="mailto:amirbenyahia550@gmail.com" data-i="mail">Écrire à amirbenyahia550@gmail.com</a>
+      <a class="btn line" href="cv.pdf" target="_blank" rel="noopener" data-i="ctaCv">CV en PDF</a>
+      <a class="btn line" href="https://github.com/Amir-Benyahia" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </section>
+</main>
+
+<div class="demo-sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="shT">
+  <section class="demo"><header><span data-i="live">Démo en direct</span><a id="shTab" target="_blank" rel="noopener" data-i="newTab">Ouvrir dans un onglet</a></header><div id="shFrame"></div></section>
+  <aside class="side">
+    <button type="button" class="pill" id="shClose" data-i="close">Fermer</button>
+    <p class="kicker" id="shY"></p>
+    <h2 id="shT"></h2>
+    <p id="shRh" class="strong"></p>
+    <p id="shDesign"></p>
+    <p id="shDev" class="muted"></p>
+    <ul id="shDetail" class="detail"></ul>
+    <p id="shNote" class="muted"></p>
+    <p class="links" id="shLinks"></p>
+  </aside>
 </div>
-<div class="hint" id="hint" aria-live="polite"></div>
-<div class="tip" id="tip" hidden></div>
-<aside class="sheet" id="sheet" aria-labelledby="sheetTitle" tabindex="-1"></aside>
-<section class="textview" id="textview" aria-label="Version texte"></section>
-<canvas id="heat" hidden></canvas>
-<div class="consent" id="consent" hidden></div>
-<div class="report" id="report" hidden tabindex="-1"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script>
-const S={fr:{sub:"UX research & design. Stage M2 IHM de 6 mois à partir du 1er mars 2027, Côte d'Azur.",prof:["Recrutement","Design","Dév"],profLbl:"Je suis",
-text:"Version texte + CV",test:"● Jouer le participant",hint:"<b>Cliquez sur un objet</b> pour ouvrir le projet · glissez pour tourner",
-task:"Tâche : trouvez le projet où Amir a interviewé des utilisateurs",stop:"Arrêter",close:"Fermer",repo:"Voir le code",cv:"Ouvrir le CV (PDF)",live:"En direct",tryLive:"Essayer en direct ↗",tab:"Ouvrir dans un onglet ↗",loading:"Chargement de la démo…",figTitle:"La maquette Figma",srvTitle:"Démo à lancer",srvText:"Ouvert en fichier local, le navigateur bloque le chargement des données. Double-cliquez sur « Ouvrir le portfolio » dans le dossier pour voir la démo.",figText:"Les écrans du prototype : envies, jauge de budget, calendrier et propositions du LLM.",figOpen:"Ouvrir la maquette dans Figma ↗",figLive:"Maquette Figma",back:"Retour au labo",
-cTitle:"Jouer le participant ?",cText:"Une tâche, environ 30 secondes. J'enregistre uniquement la position de votre souris et vos clics sur la scène, rien d'autre, et rien ne quitte votre navigateur. À la fin, vous voyez votre propre carte de chaleur.",cGo:"Commencer",cNo:"Non merci",
-rOk:"Tâche réussie",rStop:"Test arrêté",time:"temps",clicks:"clics",det:"objets ouverts avant",low:"souris passée",high:"clics",
-rRead:"À gauche, la carte de chaleur sur la scène montre où votre souris est passée et où vous avez cliqué.",rFast:"Vous avez trouvé directement : l'objet « valise » est assez parlant.",rSlow:"Vous avez ouvert d'autres objets avant : la valise n'évoque peut-être pas assez « entretiens utilisateurs ». J'ajouterais un indice visuel.",rStopT:"Pas de souci : un abandon est aussi une donnée.",rN:"Avec un seul participant, ce n'est qu'un indice. Dans une vraie étude, je comparerais au moins 5 sessions avant de changer quoi que ce soit.",
-seq:"Globalement, cette tâche était…",lo:"très difficile",hi:"très facile",thx:"Merci, réponse notée (question SEQ, 7 points).",priv:"Ces données restent dans votre navigateur.",again:"Fermer",
-avail:"Disponible",availV:"1er mars 2027 · 6 mois",zone:"Zone",zoneV:"Côte d'Azur · véhiculé",school:"Formation",schoolV:"M2 IHM · Univ. Côte d'Azur",contact:"Contact",contactV:"amirbenyahia550@gmail.com · 06 06 74 02 12",projects:"Projets"},
-en:{sub:"UX research & design. 6-month HCI Master's internship from 1 March 2027, French Riviera.",prof:["Recruiter","Design","Dev"],profLbl:"I'm a",
-text:"Text version + CV",test:"● Be the participant",hint:"<b>Click an object</b> to open the project · drag to rotate",
-task:"Task: find the project where Amir interviewed users",stop:"Stop",close:"Close",repo:"See the code",cv:"Open the CV (PDF)",live:"Live",tryLive:"Try it live ↗",tab:"Open in a new tab ↗",loading:"Loading the demo…",figTitle:"The Figma mockup",srvTitle:"Demo needs a server",srvText:"Opened as a local file, the browser blocks the data. Double-click “Ouvrir le portfolio” in the folder to see the demo.",figText:"The prototype screens: mood buttons, budget slider, calendar and LLM suggestions.",figOpen:"Open the mockup in Figma ↗",figLive:"Figma mockup",back:"Back to the lab",
-cTitle:"Be the participant?",cText:"One task, about 30 seconds. I only record your mouse position and clicks on the scene, nothing else, and nothing leaves your browser. At the end you see your own heatmap.",cGo:"Start",cNo:"No thanks",
-rOk:"Task completed",rStop:"Test stopped",time:"time",clicks:"clicks",det:"objects opened first",low:"mouse passed",high:"clicks",
-rRead:"On the left, the heatmap over the scene shows where your mouse went and where you clicked.",rFast:"You went straight to it: the suitcase reads clearly enough.",rSlow:"You opened other objects first: the suitcase may not say “user interviews” clearly. I'd add a visual cue.",rStopT:"No problem: giving up is data too.",rN:"With a single participant this is only a hint. In a real study I'd compare at least 5 sessions before changing anything.",
-seq:"Overall, this task was…",lo:"very difficult",hi:"very easy",thx:"Thanks, answer recorded (SEQ question, 7 points).",priv:"This data stays in your browser.",again:"Close",
-avail:"Available",availV:"1 March 2027 · 6 months",zone:"Area",zoneV:"French Riviera · has a car",school:"Education",schoolV:"MSc HCI · Univ. Côte d'Azur",contact:"Contact",contactV:"amirbenyahia550@gmail.com · +33 6 06 74 02 12",projects:"Projects"}};
-const P={
-ceihm:{target:true,obj:{fr:"la valise",en:"the suitcase"},col:"#ff6b4a",y:"2026",t:{fr:"Voyager malin quand on est étudiant",en:"Smart travel for students"},
- rh:{fr:"Projet UX en équipe de 4 : entretiens, personas, prototypes, évaluation.",en:"UX project in a team of 4: interviews, personas, prototypes, evaluation."},
- design:{fr:"Benchmark, personas, questionnaire, entretiens semi-directifs, modèle de tâches, design rationale, analyse heuristique.",en:"Benchmark, personas, survey, semi-structured interviews, task model, design rationale, heuristic evaluation."},
- dev:{fr:"Prototype Figma d'une appli qui pilote un LLM sans chat : boutons d'envies, jauge de budget, calendrier.",en:"Figma prototype of an app that drives an LLM without a chat: mood buttons, budget slider, calendar."},
- tags:["Figma","Entretiens / Interviews","Heuristiques"],figma:"https://www.figma.com/design/mVlaESEr5R1ppDvzYnntDe/Groupe-9-Voyage---Maquette--slides-2-12-?node-id=0-1",live:"live/ceihm/index.html",liveNote:{fr:"Prototype cliquable tiré de la maquette Figma : cliquez sur les boutons des écrans comme dans Figma.",en:"Clickable prototype built from the Figma mockup: click the buttons on the screens, just like in Figma."},
- detail:{fr:["J'ai mené et synthétisé un entretien avec une étudiante en Master : budget serré, envie de « tout visiter », méfiance envers ChatGPT.","Nous en avons tiré des personas et un modèle de tâches, puis comparé plusieurs options de design (jauge ou champs min/max, carte ou « inspirez-moi »).","Les prototypes ont été évalués par analyse heuristique."],en:["I ran and summarised an interview with a Master's student: tight budget, wants to “see everything”, distrusts ChatGPT.","We turned this into personas and a task model, then compared design options (slider vs min/max, map vs “inspire me”).","The prototypes were evaluated with a heuristic review."]}},
-spotify:{obj:{fr:"la platine",en:"the turntable"},col:"#b9a8ff",y:"2026",t:{fr:"Lire 60 ans de musique",en:"Reading 60 years of music"},rh:{fr:"Visualisation de données en équipe, 28 000 titres.",en:"Team data visualisation, 28,000 tracks."},design:{fr:"3 profils et 13 tâches ont guidé le choix des 4 vues coordonnées.",en:"3 profiles and 13 tasks drove the choice of 4 linked views."},dev:{fr:"D3.js, vues coordonnées. J'ai codé la vue « courbes multiples ».",en:"D3.js, linked views. I built the multi-line chart view."},tags:["D3.js","Data"],repo:"https://github.com/marconcini/information-visualisation",live:"live/spotify/index.html",liveNeedsServer:true,liveNote:{fr:"La vraie appli de l'équipe, avec les 28 000 titres. Ma vue : « Courbes ».",en:"The team's real app with all 28,000 tracks. My view: “Courbes” (multi-line chart)."}},
-room:{obj:{fr:"le projecteur",en:"the projector"},col:"#8cc4ff",y:"2026",t:{fr:"La salle qui répond",en:"The room that answers"},rh:{fr:"Réalité augmentée à commande vocale, iOS et Android.",en:"Voice-controlled AR app, iOS and Android."},design:{fr:"La voix pour demander, l'AR pour montrer où agir dans la salle.",en:"Voice to ask, AR to show where to act in the room."},dev:{fr:"Unity, détection du projecteur par IA, QR codes, synthèse vocale.",en:"Unity, AI projector detection, QR codes, speech synthesis."},tags:["Unity","AR"],repo:"https://github.com/Amir-Benyahia/Multimodal-project-IHM-room-guide",live:"live/roomguide/index.html",liveNote:{fr:"Les diapositives de notre soutenance : les 3 boucles d'interaction, la fusion des modalités et le cas d'une orthophoniste.",en:"Slides from our final presentation: the 3 interaction loops, modality fusion and a speech-therapist use case (in French)."}},
-flux:{obj:{fr:"l'ordinateur",en:"the laptop"},col:"#9cc7a4",y:"2026",t:{fr:"Scanner, trouver, réapprovisionner",en:"Scan, find, restock"},rh:{fr:"SaaS complet conçu et développé seul.",en:"Complete SaaS, designed and built solo."},design:{fr:"Parcours « scan & find » à une main pour l'entrepôt.",en:"One-handed “scan & find” flow for the warehouse."},dev:{fr:"React, FastAPI, PostgreSQL, Stripe, prévisions en Python.",en:"React, FastAPI, PostgreSQL, Stripe, Python forecasting."},tags:["React","FastAPI"],repo:"https://github.com/Amir-Benyahia/FluxStock",live:"live/fluxstock/index.html",liveNeedsServer:true,liveNote:{fr:"La vraie interface, branchée sur des données fictives d'un café. Ajoutez un mouvement de stock ou ouvrez un produit pour voir le calcul de réapprovisionnement.",en:"The real interface on mock data from a café. Log a stock movement or open a product to see the reorder calculation."}},
-sampler:{obj:{fr:"le sampler",en:"the sampler"},col:"#ffd97a",y:"2026",t:{fr:"Un studio dans le navigateur",en:"A studio in the browser"},rh:{fr:"Application web musicale en binôme.",en:"Web music app built in a pair."},design:{fr:"Séquenceur et ondes visibles pour un retour immédiat.",en:"Sequencer and visible waveforms for instant feedback."},dev:{fr:"Angular, Web Audio API, API Node.js.",en:"Angular, Web Audio API, Node.js API."},tags:["JavaScript","Web Audio"],repo:"https://github.com/Amir-Benyahia/Projet-Web-Sampler-Benyahia-Kadri",live:"live/sampler/index.html",liveNeedsServer:true,liveW:1500,liveNote:{fr:"La version JavaScript du sampler. Cliquez sur un pad (ou touches Z X C V…) pour jouer. Pensez au son.",en:"The JavaScript version of the sampler. Click a pad (or keys Z X C V…) to play. Sound on."}},
-maze:{obj:{fr:"le labyrinthe",en:"the maze"},col:"#ff9fbf",y:"2025",t:{fr:"Voir une IA réfléchir",en:"Watching an AI think"},rh:{fr:"Plateforme de recherche pour comparer des IA dans un Pac-Man.",en:"Research platform comparing AIs playing Pac-Man."},design:{fr:"Rendre lisibles A*, Minimax et Expectimax en temps réel.",en:"Making A*, Minimax and Expectimax readable in real time."},dev:{fr:"Moteur Python relié à une interface JavaScript, Docker.",en:"Python engine bridged to a JavaScript UI, Docker."},tags:["Python","JS","Docker"],repo:"https://github.com/Amir-Benyahia/TER_S1_N",live:"live/pacman/index.html",liveNote:{fr:"Labyrinthes produits par notre générateur Python. Jouez une partie, puis regardez les fantômes rejouer contre votre parcours, ou lancez un bot.",en:"Mazes produced by our Python generator. Play a round, then watch the ghosts replay against your path, or start a bot."}},
-resil:{obj:{fr:"le tableau de bord",en:"the dashboard"},col:"#f2a0b4",y:"2026",t:{fr:"Résilier en un clic ?",en:"Cancel in one click?"},rh:{fr:"Projet personnel en cours : audit des parcours de résiliation de 5 services et tests avec 5 personnes.",en:"Ongoing personal project: auditing the cancellation flows of 5 services and testing with 5 people."},design:{fr:"Un faux service, deux parcours : l'un chargé de dark patterns, l'autre conforme à la résiliation en trois clics. On mesure ce que les pièges coûtent.",en:"One fake service, two flows: one loaded with dark patterns, one following the French three-click cancellation rule. The test measures what the traps cost."},dev:{fr:"JavaScript sans framework, journal des clics, grille d'audit avec export CSV et JSON.",en:"Vanilla JavaScript, click logging, an audit grid with CSV and JSON export."},tags:["Dark patterns","Audit UX","Tests utilisateurs"],live:"live/resilier/index.html",
- detail:{fr:["Depuis juin 2023, un abonnement souscrit en ligne doit pouvoir être résilié en ligne, simplement. Dans les faits, beaucoup de parcours font tout pour vous retenir.","J'ai construit Abonnix, un faux service de streaming, avec deux versions du même parcours. Chaque piège porte le nom de l'ontologie des dark patterns de Gray et al. (CHI 2024).","Le protocole : 5 personnes font les deux versions, on mesure la réussite, le temps, les clics et la facilité perçue. Une grille sert à auditer de vrais services avec la même ontologie."],en:["Since June 2023, French law says a subscription taken online must be cancellable online, simply. In practice many flows do everything to keep you.","I built Abonnix, a fake streaming service, with two versions of the same flow. Each trap is named after the dark patterns ontology by Gray et al. (CHI 2024).","The protocol: 5 people try both versions; success, time, clicks and perceived ease are measured. An audit grid applies the same ontology to real services."]},
- liveNote:{fr:"Essayez de résilier votre abonnement Abonnix, puis comparez avec la version conforme. Les résultats des tests seront publiés une fois les séances passées.",en:"Try to cancel your Abonnix subscription, then compare with the compliant version (in French). Test results will be published once the sessions are done."}}};
-const ORDER={rh:["ceihm","resil","flux","room","spotify","maze","sampler"],design:["ceihm","resil","spotify","room","flux","sampler","maze"],dev:["flux","maze","sampler","resil","room","spotify","ceihm"]};
-let lang=(()=>{try{return localStorage.getItem("labo-lang")||((navigator.language||"").startsWith("en")?"en":"fr")}catch(e){return"fr"}})();
-let profile="design",mode="idle",t0=0,clicks=[],trail=[],detours=0,score=0,current=null;
-const $=id=>document.getElementById(id),L=()=>S[lang];
-
-/* ---------- 3D ---------- */
-const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
-const cv=$("scene"),renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-renderer.setClearColor(0xe9edf1);
-const scene=new THREE.Scene();
-const cam=new THREE.OrthographicCamera(-10,10,10,-10,0.1,200);
-scene.add(new THREE.HemisphereLight(0xffffff,0xb7c2cf,0.7));
-const sun=new THREE.DirectionalLight(0xfff6ea,0.9);sun.position.set(14,22,10);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);
-Object.assign(sun.shadow.camera,{left:-14,right:14,top:14,bottom:-14});sun.shadow.radius=6;scene.add(sun);
-const M=c=>new THREE.MeshStandardMaterial({color:c,roughness:.85,metalness:0});
-function box(w,h,d,c,x,y,z,parent){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c));m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;(parent||room).add(m);return m}
-function cyl(rt,rb,h,c,x,y,z,parent,seg=32){const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,seg),M(c));m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;(parent||room).add(m);return m}
-const room=new THREE.Group();scene.add(room);
-// floor slab + walls (cut-away)
-box(14,.6,14,0xe6dccd,0,-.3,0);box(14.2,.25,14.2,0xc9d0d9,0,-.72,0);
-const walls=[];
-function wall(nx,nz){const g=new THREE.Group();g.userData.n=new THREE.Vector3(nx,0,nz);g.userData.o=1;room.add(g);walls.push(g);return g}
-const WB=wall(0,-1),WL=wall(-1,0),WR=wall(1,0),WF=wall(0,1);
-box(14,8,.4,0xdfe5ec,0,4,-7.2,WB);box(.4,8,14,0xd3dbe5,-7.2,4,0,WL);box(.4,8,14,0xd3dbe5,7.2,4,0,WR);box(14,8,.4,0xdfe5ec,0,4,7.2,WF);
-box(14,.3,.5,0xdfe4ea,0,.15,-6.95,WB);box(.5,.3,14,0xdfe4ea,-6.95,.15,0,WL);box(.5,.3,14,0xdfe4ea,6.95,.15,0,WR);box(14,.3,.5,0xdfe4ea,0,.15,6.95,WF);
-// right wall: window on the Riviera (sky, sea, sun, a sail)
-box(.12,3.4,5.2,0xffffff,6.98,4.6,-1,WR);box(.1,3,4.8,0xbfe3f7,6.93,4.6,-1,WR);box(.1,1.1,4.8,0x3f8fc9,6.92,3.65,-1,WR);box(.1,.25,4.8,0x6fb3df,6.91,4.25,-1,WR);
-{const sunD=new THREE.Mesh(new THREE.CircleGeometry(.45,32),M(0xffd97a));sunD.position.set(6.86,5.4,-2.4);sunD.rotation.y=-Math.PI/2;WR.add(sunD)}
-box(.06,.5,.04,0xffffff,6.88,4.4,.2,WR);box(.06,.1,.5,0xffffff,6.88,4.15,.2,WR);box(.3,.25,5.4,0xffffff,6.85,2.85,-1,WR);
-// front wall: door + shelf with books
-box(2.6,5.6,.1,0xf3ede4,-3.6,2.8,6.95,WF);cyl(.12,.12,.2,0x1d2230,-2.6,2.7,6.85,WF).rotation.x=Math.PI/2;
-box(3.4,.15,.9,0xffffff,3,4.2,6.55,WF);[[0xff6b4a,.5],[0xb9a8ff,.65],[0x8cc4ff,.55],[0x9cc7a4,.7],[0xffd97a,.45]].forEach(([c,h],i)=>box(.28,h*1.4,.7,c,1.7+i*.34,4.27+h*.7,6.55,WF));
-// rug
-cyl(3.6,3.6,.06,0xcfc4f2,1.2,.03,1.8,null,48);cyl(2.6,2.6,.07,0xbcaeef,1.2,.04,1.8,null,48);
-// one-way observation window on back wall (usability lab nod)
-box(5.8,3.2,.12,0xffffff,-1.2,4.6,-7.0,WB);box(5.4,2.8,.1,0x9fc3e6,-1.2,4.6,-6.95,WB);box(5.8,.2,.3,0xffffff,-1.2,3.1,-6.88,WB);
-// desk
-const desk=box(5.2,.25,2.4,0xffffff,2.6,2.4,-4.9);[[0.3,0.3],[4.9,0.3],[0.3,2.1],[4.9,2.1]].forEach(([dx,dz])=>box(.18,2.3,.18,0xdfe4ea,.1+dx,1.15,-6.1+dz));
-// chair
-box(1.6,.2,1.6,0xff9a80,2.2,1.5,-2.6);box(1.6,1.8,.2,0xff9a80,2.2,2.5,-1.9);cyl(.08,.08,1.4,0xbfc7d1,2.2,.7,-2.6);
-// plant
-cyl(.55,.45,1,0xf2c4a8,6,.5,-6);const leaf=new THREE.Mesh(new THREE.SphereGeometry(.9,16,12),M(0x8fbf8a));leaf.position.set(6,1.8,-6);leaf.scale.set(1,1.3,1);leaf.castShadow=true;room.add(leaf);
-
-const objects={};
-function mk(id,build,pos,parent){const g=new THREE.Group();g.position.copy(pos);build(g);g.userData.id=id;g.traverse(o=>{if(o.isMesh)o.userData.id=id});(parent||room).add(g);objects[id]=g;g.userData.base=pos.y;return g}
-// laptop on desk -> FluxStock
-mk("flux",g=>{box(1.9,.1,1.3,0xd7dde4,0,0,0,g);const s=box(1.9,1.25,.08,0x2d3445,0,.62,-.62,g);s.rotation.x=-.18;box(1.7,1.05,.02,0x9cc7a4,0,.64,-.57,g).rotation.x=-.18},new THREE.Vector3(1.6,2.58,-4.8));
-// sampler pad on desk
-mk("sampler",g=>{box(1.6,.25,1.6,0x2d3445,0,0,0,g);const c=[0xffd97a,0xff6b4a,0x8cc4ff,0xb9a8ff];for(let i=0;i<4;i++)for(let j=0;j<4;j++)box(.3,.08,.3,c[(i+j)%4],-.54+i*.36,.16,-.54+j*.36,g)},new THREE.Vector3(3.9,2.66,-4.7));
-// turntable -> Spotify
-mk("spotify",g=>{box(2.4,.5,2,0xb9a8ff,0,0,0,g);cyl(.85,.85,.06,0x1d2230,-.2,.28,0,g,40);cyl(.25,.25,.08,0xffd97a,-.2,.3,0,g);box(.08,.08,1,0xffffff,.85,.32,-.1,g).rotation.y=.4},new THREE.Vector3(-4.6,.25,-4.4));
-// suitcase -> CEIHM
-mk("ceihm",g=>{box(1.9,2.4,.8,0xff6b4a,0,0,0,g);box(1.9,.12,.84,0xe0563a,0,.4,0,g);box(.7,.12,.12,0x1d2230,0,1.32,0,g);box(.1,.35,.12,0x1d2230,-.3,1.2,0,g);box(.1,.35,.12,0x1d2230,.3,1.2,0,g);box(.6,.4,.05,0xffd97a,.45,-.4,.43,g)},new THREE.Vector3(-3.6,1.2,2.6));
-// projector -> Room Guide
-mk("room",g=>{cyl(.07,.07,2.2,0xbfc7d1,0,0,0,g);box(1.3,.6,1,0x8cc4ff,0,1.35,0,g);cyl(.25,.25,.3,0x1d2230,0,1.35,.6,g).rotation.x=Math.PI/2;cyl(.6,.6,.08,0xbfc7d1,0,-1.08,0,g)},new THREE.Vector3(4.8,1.12,2.4));
-// maze on left wall -> AI project
-mk("maze",g=>{box(.12,3,3,0xffffff,0,0,0,g);const G=["#######","#...#.#","#.#.#.#","#.#...#","#.###.#","#.....#","#######"];const c=3/7;G.forEach((row,r)=>[...row].forEach((ch,k)=>{if(ch==="#")box(.22,c*.92,c*.92,0xff8fb3,.1,1.5-c/2-r*c,-1.5+c/2+k*c,g)}));const a=new THREE.Mesh(new THREE.SphereGeometry(.15,16,12),M(0xffc93c));a.position.set(.2,1.5-c/2-5*c,-1.5+c/2+1*c);g.add(a);[[5,3],[3,3],[3,4]].forEach(([r,k])=>box(.12,.08,.08,0x1d2230,.12,1.5-c/2-r*c,-1.5+c/2+k*c,g))},new THREE.Vector3(-6.95,4.4,-2.4),WL);
-// Subscription dashboard on back wall -> "Résilier en un clic ?" (cancellation flows, dark patterns)
-mk("resil",g=>{box(2.6,1.7,.06,0xf7f4ef,0,.15,0,g);box(2.36,1.46,.04,0x1d1824,0,.15,.03,g);
- box(.5,.07,.02,0xe8366b,-.78,.68,.06,g);[.36,.12,-.12].forEach((y,i)=>{box(1.5-i*.3,.05,.02,0x8d8499,-.35-i*.15,y,.06,g)});
- box(.52,.26,.02,0x3a3245,.62,.25,.06,g);const k=new THREE.Mesh(new THREE.SphereGeometry(.1,16,12),M(0xf7f4ef));k.position.set(.5,.25,.1);g.add(k);
- box(1.1,.26,.02,0xe8366b,-.25,-.32,.06,g);box(.36,.06,.02,0x6c6378,.68,-.32,.06,g);
- box(1.3,.06,.45,0xe3ded6,0,-.95,.22,g);const c1=box(.42,.04,.28,0xf2a0b4,-.26,-.9,.22,g);c1.rotation.y=.18;const c2=box(.36,.04,.28,0xf2a0b4,.2,-.9,.24,g);c2.rotation.y=-.12;box(.1,.045,.28,0x1d2230,-.2,-.885,.22,g)},new THREE.Vector3(4.2,5.2,-6.95),WB);
-
-let yaw=0,targetYaw=0,drag=null,hover=null;
-// The room lives in the free area right of the giant name: frustum shifted in screen space so rotation stays centred.
-function frame(){const w=innerWidth,h=innerHeight,a=w/h,frac=a>1.2?.58:a>=.8?.8:1,s=a<.8?Math.max(11,11.5/a):Math.max(9.5,11/(a*frac)),off=a<.8?0:(1-frac/2-.02-.5)*2*s*a;
- cam.left=-s*a-off;cam.right=s*a-off;cam.top=s;cam.bottom=-s;cam.updateProjectionMatrix();renderer.setSize(w,h,false);
- room.position.set(0,a<.8?-1.5:-2.2,0)}
-function camPos(){const r=40,el=.62;cam.position.set(Math.sin(Math.PI/4)*r*Math.cos(el),r*Math.sin(el),Math.cos(Math.PI/4)*r*Math.cos(el));cam.lookAt(0,2,0);room.rotation.y=yaw}
-addEventListener("resize",frame);frame();
-addEventListener("keydown",e=>{if(e.target.closest&&e.target.closest("input,textarea,#sheet,#textview,#consent"))return;if(e.key==="ArrowLeft")targetYaw-=Math.PI/4;if(e.key==="ArrowRight")targetYaw+=Math.PI/4});
-const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();
-function pick(e){const r=cv.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,cam);const hit=ray.intersectObjects(Object.values(objects),true).find(h=>{let o=h.object;while(o){if(!o.visible||(o.userData.n&&o.userData.o<.5))return false;o=o.parent}return true});return hit?hit.object.userData.id:null}
-cv.addEventListener("pointerdown",e=>{drag={x:e.clientX,y:e.clientY,yaw:targetYaw,moved:false};cv.setPointerCapture(e.pointerId)});
-cv.addEventListener("pointermove",e=>{
- if(drag){const dx=e.clientX-drag.x;if(Math.abs(dx)>4)drag.moved=true;targetYaw=drag.yaw+dx*.006}
- const id=pick(e);setHover(id,e);
- if(mode==="test"&&e.pointerType==="mouse"){const l=trail[trail.length-1];if(!l||Math.hypot(l[0]-e.clientX,l[1]-e.clientY)>14)trail.push([e.clientX,e.clientY])}});
-cv.addEventListener("pointerup",e=>{const was=drag;drag=null;if(was&&was.moved)return;if(mode==="test")clicks.push([e.clientX,e.clientY]);const id=pick(e);if(id)openCase(id)});
-cv.addEventListener("pointerleave",()=>setHover(null));
-function setHover(id,e){hover=id;cv.style.cursor=id?"pointer":drag?"grabbing":"grab";const tip=$("tip");if(id&&e){tip.hidden=false;tip.textContent=P[id].t[lang];tip.style.left=e.clientX+"px";tip.style.top=e.clientY+"px"}else tip.hidden=true}
-const camDir=new THREE.Vector3(Math.sin(Math.PI/4),0,Math.cos(Math.PI/4)),wn=new THREE.Vector3();
-walls.forEach(g=>g.traverse(o=>{if(o.isMesh){o.material.transparent=true}}));
-function fadeWalls(k){walls.forEach(g=>{wn.copy(g.userData.n).applyAxisAngle(THREE.Object3D.DefaultUp,room.rotation.y);const want=wn.dot(camDir)>.08?0:1;g.userData.o+=(want-g.userData.o)*(RM?1:k(.15));const o=g.userData.o;g.visible=o>.03;g.traverse(m=>{if(m.isMesh){m.material.opacity=o;m.castShadow=o>.5}})})}
-let last=0;function loop(t){const dt=Math.min(.1,(t-(last||t))/1000);last=t;const k=f=>1-Math.pow(1-f,dt*60);yaw+=(targetYaw-yaw)*k(.08);camPos();fadeWalls(k);
- for(const [id,g] of Object.entries(objects)){const lift=(id===hover||id===current)?.35:0;g.position.y+=((g.userData.base+lift)-g.position.y)*k(.15);
-  if(!RM&&id==="spotify")g.children[1].rotation.y=t/600}
- renderer.render(scene,cam);requestAnimationFrame(loop)}
-requestAnimationFrame(loop);
-
-/* ---------- UI ---------- */
-function ui(){const s=L();document.documentElement.lang=lang;
- $("sub").textContent=s.sub;
- $("profSeg").innerHTML=`<span class="lbl" style="align-self:center;padding-left:10px">${s.profLbl}</span>`+["rh","design","dev"].map((k,i)=>`<button type="button" data-p="${k}" aria-pressed="${k===profile}">${s.prof[i]}</button>`).join("");
- document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{profile=b.dataset.p;ui();if(current)openCase(current,true);if($("textview").classList.contains("open"))textView()});
- $("textBtn").textContent=s.text;$("testBtn").textContent=mode==="test"?s.stop:s.test;
- $("hint").innerHTML=mode==="test"?s.task:s.hint;$("hint").classList.toggle("rec",mode==="test");
- document.querySelectorAll("[data-l]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.l===lang));}
-function openCase(id,silent){const x=P[id],s=L();
- if(!silent&&mode==="test"){if(x.target){closeSheet();finish(true);return}detours++}
- current=id;renderSheet(id)}
-function renderSheet(id){const x=P[id],s=L(),sh=$("sheet");
- const det=x.detail?`<ul>${x.detail[lang].map(d=>`<li>${d}</li>`).join("")}</ul>`:["rh","design","dev"].filter(k=>k!==profile&&k!=="rh").map(k=>`<p>${x[k][lang]}</p>`).join("");
- const txt=`<div class="top"><span class="yr">${x.y} · ${x.obj[lang]}</span><button class="pill" type="button" id="closeSheet">${s.close}</button></div><div class="swatch" style="background:${x.col}"></div>
- <h2 id="sheetTitle">${x.t[lang]}</h2><p class="lead">${x[profile][lang]}</p>${det}${x.liveNote?`<p class="note2">${x.liveNote[lang]}</p>`:""}<div class="tags">${x.tags.map(t=>`<span>${t}</span>`).join("")}</div>${x.repo?`<a href="${x.repo}" target="_blank" rel="noopener">${s.repo} →</a>`:""}`;
- // External embeds (Figma) are blocked inside the Claude artifact viewer; on a normal host they embed, otherwise we link out.
- const extOK=/(^|\.)github\.io$|^localhost$|^127\.|^$/.test(location.hostname);
- const src=x.live||(x.figma?(extOK?"https://www.figma.com/embed?embed_host=share&url="+encodeURIComponent(x.figma):"fig:"+x.figma):"");
- const tabUrl=x.live||x.figma;
- const sameLive=src&&sh.dataset.live===src&&sh.querySelector(".frame");
- if(src){if(sameLive){sh.querySelector(".txt").innerHTML=txt;sh.querySelector(".livebar b").textContent=x.figma?s.figLive:s.live;if(src.startsWith("fig:"))sh.querySelector(".figcard").innerHTML=figCard(x,s);const a=sh.querySelector(".livebar a");a.textContent=s.tab}
-  else{const local=location.protocol==="file:"&&x.liveNeedsServer;const inner=local?`<div class="figcard"><h3>${s.srvTitle}</h3><p>${s.srvText}</p></div>`:src.startsWith("fig:")?`<div class="figcard">${figCard(x,s)}</div>`:`<div class="ld">${s.loading}</div><iframe src="${src}" title="${x.t[lang]}" allow="autoplay; fullscreen" loading="eager" allowfullscreen></iframe>`;
-  sh.innerHTML=`<div class="live"><div class="livebar"><b>${x.figma?s.figLive:s.live}</b><span style="display:flex;gap:12px;align-items:center"><a href="${tabUrl}" target="_blank" rel="noopener">${s.tab}</a><button class="pill mclose" type="button" id="closeLive">${s.close}</button></span></div><div class="frame">${inner}</div></div><div class="txt">${txt}</div>`;sh.dataset.live=src}
-  sh.classList.add("wide");fitLive(x);const cl=$("closeLive");if(cl)cl.onclick=closeSheet}
- else{sh.classList.remove("wide");sh.dataset.live="";sh.innerHTML=txt}
- $("tip").hidden=true;sh.classList.add("open");sh.focus({preventScroll:true});$("closeSheet").onclick=closeSheet;fitTitle()}
-// Long single words (RÉAPPROVISIONNER) must not overflow the text column: shrink the title until it fits.
-function fitTitle(){const h=$("sheetTitle");if(!h)return;h.style.fontSize="";let f=parseFloat(getComputedStyle(h).fontSize);while(h.scrollWidth>h.clientWidth+1&&f>24){f-=2;h.style.fontSize=f+"px"}}
-let fitRO=null;
-// Apps designed for wide screens are rendered at their native width, then scaled down to fit the frame (like a device preview).
-function figCard(x,s){return`<h3>${s.figTitle}</h3><p>${s.figText}</p><a href="${x.figma}" target="_blank" rel="noopener">${s.figOpen}</a>`}
-function fitLive(x){const f=$("sheet").querySelector(".frame"),ifr=f&&f.querySelector("iframe");if(!ifr)return;fitRO&&fitRO.disconnect();
- const fit=()=>{const W=f.clientWidth,H=f.clientHeight,vw=x.liveW||0;if(!vw||W>=vw){ifr.style.width="100%";ifr.style.height="100%";ifr.style.transform="";return}
-  const k=W/vw;ifr.style.width=vw+"px";ifr.style.height=(H/k)+"px";ifr.style.transform=`scale(${k})`};
- fit();fitRO=new ResizeObserver(fit);fitRO.observe(f)}
-function closeSheet(){const sh=$("sheet");sh.classList.remove("open");current=null;if(sh.dataset.live){setTimeout(()=>{if(!sh.classList.contains("open")){sh.innerHTML="";sh.dataset.live="";sh.classList.remove("wide")}},400)}}
-function textView(){const s=L(),tv=$("textview");
- tv.innerHTML=`<div class="wrap"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap"><button class="pill" type="button" id="backBtn">← ${s.back}</button><a class="pill" href="cv.pdf" target="_blank" rel="noopener">${s.cv}</a></div>
- <h2>Amir Benyahia</h2><p style="margin:0;color:var(--muted)">${s.sub}</p>
- <div class="facts"><div><span>${s.avail}</span><b>${s.availV}</b></div><div><span>${s.zone}</span><b>${s.zoneV}</b></div><div><span>${s.school}</span><b>${s.schoolV}</b></div><div><span>${s.contact}</span><b style="user-select:all;word-break:break-word">${s.contactV}</b></div></div>
- <h3 style="font:800 15px var(--body);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:10px 0 0">${s.projects}</h3>
- ${ORDER[profile].map(id=>{const x=P[id];return`<article><span class="yr" style="font-size:13px;color:var(--muted)">${x.y}</span><h3>${x.t[lang]}</h3><p>${x[profile][lang]}</p><p style="margin-top:6px;display:flex;gap:16px;flex-wrap:wrap">${x.live?`<a href="${x.live}" target="_blank" rel="noopener">${s.tryLive}</a>`:""}${x.figma?`<a href="${x.figma}" target="_blank" rel="noopener">${s.figOpen}</a>`:""}${x.repo?`<a href="${x.repo}" target="_blank" rel="noopener">${s.repo} →</a>`:""}</p></article>`}).join("")}</div>`;
- tv.classList.add("open");$("backBtn").onclick=()=>tv.classList.remove("open");$("backBtn").focus()}
-$("textBtn").onclick=textView;
-$("testBtn").onclick=()=>{if(mode==="test")return finish(false);const s=L(),c=$("consent");
- c.innerHTML=`<h2>${s.cTitle}</h2><p>${s.cText}</p><div class="row"><button class="pill rec" type="button" id="cGo">${s.cGo}</button><button class="pill" type="button" id="cNo">${s.cNo}</button></div>`;c.hidden=false;$("cGo").focus();
- $("cNo").onclick=()=>c.hidden=true;$("cGo").onclick=()=>{c.hidden=true;closeSheet();mode="test";clicks=[];trail=[];detours=0;score=0;t0=performance.now();ui()}};
-function finish(ok){$("tip").hidden=true;const sec=Math.round((performance.now()-t0)/1000);mode="ended";ui();drawHeat();report(ok,sec)}
-function drawHeat(){const c=$("heat"),w=innerWidth,h=innerHeight;c.width=w;c.height=h;c.hidden=false;const x=c.getContext("2d");
- const o=document.createElement("canvas");o.width=w;o.height=h;const ox=o.getContext("2d");
- const blob=(px,py,r,a)=>{const g=ox.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,`rgba(0,0,0,${a})`);g.addColorStop(1,"rgba(0,0,0,0)");ox.fillStyle=g;ox.beginPath();ox.arc(px,py,r,0,7);ox.fill()};
- trail.forEach(([a,b])=>blob(a,b,42,.12));clicks.forEach(([a,b])=>blob(a,b,64,.85));
- const rp=document.createElement("canvas");rp.width=256;rp.height=1;const rx=rp.getContext("2d"),rg=rx.createLinearGradient(0,0,256,0);
- [[0,"#3b6cff"],[.3,"#00d0e0"],[.5,"#47e07a"],[.7,"#ffd84a"],[.85,"#ff8a2a"],[1,"#ff3b3b"]].forEach(([q,col])=>rg.addColorStop(q,col));rx.fillStyle=rg;rx.fillRect(0,0,256,1);const pal=rx.getImageData(0,0,256,1).data;
- const img=ox.getImageData(0,0,w,h),d=img.data;for(let i=0;i<d.length;i+=4){const a=d[i+3];if(a>3){const k=a*4;d[i]=pal[k];d[i+1]=pal[k+1];d[i+2]=pal[k+2];d[i+3]=Math.min(215,40+a*1.5)}else d[i+3]=0}
- x.clearRect(0,0,w,h);ox.putImageData(img,0,0);x.drawImage(o,0,0);
- clicks.forEach(([a,b],i)=>{x.fillStyle="#1d2230";x.beginPath();x.arc(a,b,12,0,7);x.fill();x.fillStyle="#fff";x.font="600 12px Instrument Sans, sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText(i+1,a,b+.5)})}
-function report(ok,sec){const s=L(),r=$("report");
- r.innerHTML=`<h2>${ok?s.rOk:s.rStop}</h2><div class="kpis"><div><b>${sec}s</b><span>${s.time}</span></div><div><b>${clicks.length}</b><span>${s.clicks}</span></div><div><b>${detours}</b><span>${s.det}</span></div></div>
- <div class="legend"><span>${s.low}</span><i></i><span>${s.high}</span></div><p>${s.rRead}</p><p>${ok?(detours?s.rSlow:s.rFast):s.rStopT}</p><p class="note">${s.rN}</p>
- ${ok?`<p style="font-weight:600;margin-top:12px">${s.seq}</p><div class="seq">${[1,2,3,4,5,6,7].map(n=>`<button type="button" data-n="${n}" aria-pressed="${n===score}">${n}</button>`).join("")}</div><div class="seqlbl"><span>${s.lo}</span><span>${s.hi}</span></div><p class="ok" id="thx" ${score?"":"hidden"}>${s.thx}</p>`:""}
- <p class="note">${s.priv}</p><div class="row"><button class="pill" type="button" id="rClose">${s.again}</button></div>`;
- r.hidden=false;r.focus({preventScroll:true});
- r.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{score=+b.dataset.n;r.querySelectorAll("[data-n]").forEach(o=>o.setAttribute("aria-pressed",+o.dataset.n===score));$("thx").hidden=false});
- $("rClose").onclick=closeReport}
-function closeReport(){$("report").hidden=true;$("heat").hidden=true;mode="idle";ui()}
-document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("report").hidden)closeReport();else if(!$("consent").hidden)$("consent").hidden=true;else if($("textview").classList.contains("open"))$("textview").classList.remove("open");else closeSheet()});
-document.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{lang=b.dataset.l;try{localStorage.setItem("labo-lang",lang)}catch(e){}ui();if(current)renderSheet(current);if($("textview").classList.contains("open"))textView()});
-ui();
-</script>
+<script src="data.js"></script>
+<script src="main.js"></script>
 </body>
 </html>

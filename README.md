@@ -1,13 +1,12 @@
-# Le labo d'Amir
+# Portfolio d'Amir Benyahia
 
 Portfolio d'Amir Benyahia, M2 Informatique parcours IHM (Université Côte d'Azur).
 
-En ligne : https://amir-benyahia.github.io/Portfolio-Amir/
+En ligne : https://amir-benyahia.github.io/Portfo- Un portfolio éditorial sur le thème de la F1 : feux de départ à l'arrivée, projets présentés en grille de départ, contact en parc fermé.
+- Les six projets s'ouvrent sur leur démo en direct.
+- FR et EN, version sans animation si le système le demande, navigation au clavier.
 
-- Une pièce en 3D (three.js) où chaque objet ouvre un projet.
-- Le contenu s'adapte au profil du visiteur (recrutement, design, dév) et existe en FR et EN.
-- Le mode « Jouer le participant » propose un petit test d'utilisabilité et affiche la carte de chaleur de vos clics à la fin. Rien ne quitte le navigateur.
-- Une version texte reprend tout le contenu pour l'accessibilité.
+sibilité.
 
 Démos intégrées (`live/`) : le prototype cliquable du projet CEIHM (écrans Figma), la visualisation Spotify en D3.js (projet de groupe, dépôt d'origine : marconcini/information-visualisation) et le sampler Web Audio (copie statique de Projet-Web-Sampler-Benyahia-Kadri).
 

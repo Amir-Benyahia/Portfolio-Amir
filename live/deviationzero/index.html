@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Deviation Zero — Infiltrez le Silicon Sanctuary en imitant les robots IA. Games on Web 2026.">
+    <title>Deviation Zero | Games on Web 2026</title>
+
+    <!-- BabylonJS 7.x CDN -->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="https://cdn.babylonjs.com/materialsLibrary/babylonjs.materials.min.js"></script>
+
+    <!-- Havok physics (WASM). Async init dans Game.initPhysics() -->
+    <script src="https://cdn.babylonjs.com/havok/HavokPhysics_umd.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- BabylonJS Render Canvas -->
+    <canvas id="renderCanvas"></canvas>
+
+    <!-- ===== Main Menu ===== -->
+    <div id="main-menu">
+
+        <!-- Animated background layers -->
+        <div class="menu-bg">
+            <div class="menu-grid"></div>
+            <div class="menu-scanlines"></div>
+            <div class="menu-scan-bar"></div>
+            <div class="menu-vignette"></div>
+            <div id="menu-particles"></div>
+        </div>
+
+        <!-- Corner frame decorations -->
+        <div class="menu-corner tl"></div>
+        <div class="menu-corner tr"></div>
+        <div class="menu-corner bl"></div>
+        <div class="menu-corner br"></div>
+
+        <!-- ── Main content (title + nav) ── -->
+        <div class="menu-content" id="menu-content">
+            <div class="menu-header">
+                <div class="menu-pretitle">GAMES ON WEB 2026</div>
+                <h1 class="menu-title" data-text="DEVIATION ZERO">DEVIATION ZERO</h1>
+                <div class="menu-tagline">INFILTREZ LE SILICON SANCTUARY</div>
+            </div>
+
+            <nav class="menu-nav">
+                <button class="menu-btn primary" onclick="menuAction('play')">
+                    <span class="btn-label">JOUER</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+                <button class="menu-btn" onclick="menuAction('scores')">CLASSEMENT</button>
+                <button class="menu-btn" onclick="menuAction('howto')">COMMENT JOUER</button>
+                <button class="menu-btn" onclick="menuAction('credits')">CRÉDITS</button>
+                <button class="menu-btn menu-btn-jury" onclick="menuAction('jury')">MODE JURY</button>
+            </nav>
+        </div>
+
+        <!-- ── Leaderboard panel ── -->
+        <div class="menu-panel" id="panel-scores">
+            <button class="menu-back" onclick="menuBack()">← RETOUR</button>
+            <div class="menu-panel-title">CLASSEMENT</div>
+            <ul class="menu-lb-list" id="menu-lb-list"></ul>
+        </div>
+
+        <!-- ── How to play panel ── -->
+        <div class="menu-panel" id="panel-howto">
+            <button class="menu-back" onclick="menuBack()">← RETOUR</button>
+            <div class="menu-panel-title">COMMENT JOUER</div>
+            <div class="menu-panel-body">
+                <div class="howto-row">
+                    <kbd class="howto-key">Z&nbsp;&nbsp;A&nbsp;&nbsp;S&nbsp;&nbsp;D</kbd>
+                    <span class="howto-desc">Déplacer le personnage</span>
+                </div>
+                <div class="howto-row">
+                    <kbd class="howto-key">↑&nbsp;&nbsp;←&nbsp;&nbsp;↓&nbsp;&nbsp;→</kbd>
+                    <span class="howto-desc">Déplacer le personnage</span>
+                </div>
+                <hr class="howto-sep">
+                <p class="howto-tip">Imitez les robots autour de vous pour passer inaperçu. Suivez le mouvement de la foule — bougez au rythme du battement pour réduire la suspicion. La flèche EXIT indique la porte de sortie.</p>
+                <hr class="howto-sep">
+                <div class="howto-row">
+                    <kbd class="howto-key" style="color:#00e5ff">ESPACE</kbd>
+                    <span class="howto-desc">Dash — propulsion rapide (CD: 5s)</span>
+                </div>
+                <hr class="howto-sep">
+                <div class="howto-row">
+                    <kbd class="howto-key">OBJECTIF</kbd>
+                    <span class="howto-desc">Rejoignez la porte EXIT avant la fin du timer</span>
+                </div>
+                <div class="howto-row">
+                    <kbd class="howto-key" style="color:#00ffff">SYNC</kbd>
+                    <span class="howto-desc">Power-up cyan — -35% suspicion</span>
+                </div>
+                <div class="howto-row">
+                    <kbd class="howto-key" style="color:#ffcc00">BURST</kbd>
+                    <span class="howto-desc">Power-up jaune — vitesse +50% pendant 4s</span>
+                </div>
+                <div class="howto-row">
+                    <kbd class="howto-key" style="color:#cc00ff">EMP</kbd>
+                    <span class="howto-desc">Power-up violet — gèle les sentinelles 5s</span>
+                </div>
+                <div class="howto-row danger">
+                    <kbd class="howto-key danger">DANGER</kbd>
+                    <span class="howto-desc">Évitez les drones et patrouilles au sol</span>
+                </div>
+                <div class="howto-row">
+                    <kbd class="howto-key" style="color:#00d4ff">ZONE SÛRE</kbd>
+                    <span class="howto-desc">Disques bleus — suspicion gelée et décroissance rapide</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Mode Jury panel ── -->
+        <div class="menu-panel" id="panel-jury">
+            <button class="menu-back" onclick="menuBack()">← RETOUR</button>
+            <div class="menu-panel-title">MODE JURY</div>
+            <div class="menu-panel-body">
+                <p class="jury-intro">Configuration de test rapide réservée à l'évaluation. Permet d'inspecter le jeu sans contrainte de timer ni de détection.</p>
+                <hr class="howto-sep">
+                <div class="jury-row">
+                    <label class="jury-label" for="jury-godmode">
+                        <input type="checkbox" id="jury-godmode" />
+                        <span>GOD MODE</span>
+                    </label>
+                    <span class="jury-desc">Suspicion gelée à 0 — sentinelles inactives</span>
+                </div>
+                <div class="jury-row">
+                    <label class="jury-label" for="jury-notimer">
+                        <input type="checkbox" id="jury-notimer" />
+                        <span>TIMER INFINI</span>
+                    </label>
+                    <span class="jury-desc">Pas de countdown — exploration libre</span>
+                </div>
+                <div class="jury-row">
+                    <label class="jury-label" for="jury-level">
+                        <span>NIVEAU DE DÉPART</span>
+                    </label>
+                    <select id="jury-level" class="jury-select">
+                        <option value="1">1 — SILICON SANCTUARY</option>
+                        <option value="2">2 — AMBER GRID</option>
+                        <option value="3">3 — PHANTOM ZONE</option>
+                        <option value="4">4 — NEURAL CORE</option>
+                        <option value="5">5 — CRIMSON FORGE</option>
+                        <option value="6">6 — VOID PROTOCOL</option>
+                        <option value="8">8 — OBSIDIAN NEXUS</option>
+                        <option value="10">10 — ABYSS GATEWAY</option>
+                    </select>
+                </div>
+                <hr class="howto-sep">
+                <button class="menu-btn primary jury-launch" onclick="launchJuryMode()">
+                    <span class="btn-label">LANCER PARTIE</span>
+                    <span class="btn-arrow">→</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- ── Credits panel ── -->
+        <div class="menu-panel" id="panel-credits">
+            <button class="menu-back" onclick="menuBack()">← RETOUR</button>
+            <div class="menu-panel-title">CRÉDITS</div>
+            <div class="menu-panel-body">
+                <p class="credits-lore">En 2089, le Silicon Sanctuary est une cité-état entièrement gouvernée par des IA. Vous êtes un humain infiltré au cœur de cette zone interdite — votre seule chance de survie&nbsp;: imiter parfaitement les robots qui vous entourent.</p>
+                <hr class="howto-sep">
+                <div class="credits-row"><span>Conception &amp; Développement</span><span>Amir Benyahia &amp; Elies Lounis</span></div>
+                <div class="credits-row"><span>Encadrement</span><span>Michel Buffa — M1 Info</span></div>
+                <div class="credits-row"><span>Moteur 3D</span><span>BabylonJS 7</span></div>
+                <div class="credits-row"><span>Compétition</span><span>Games on Web 2026</span></div>
+            </div>
+        </div>
+
+    </div><!-- /#main-menu -->
+
+    <!-- ===== HUD ===== -->
+    <div id="hud">
+        <div id="hud-level">LVL 1</div>
+        <div id="suspicion-container">
+            <span id="suspicion-label">SUSPICION</span>
+            <div id="suspicion-bar">
+                <div id="suspicion-fill"></div>
+            </div>
+            <span id="suspicion-value">0%</span>
+        </div>
+
+        <!-- Timer -->
+        <div id="hud-timer">
+            <span class="hud-timer-label">TIME</span>
+            <span id="hud-timer-value">2:00</span>
+        </div>
+
+        <!-- Beat indicator -->
+        <div id="hud-beat">
+            <div id="hud-beat-dot"></div>
+            <span id="hud-beat-bpm">80 BPM</span>
+        </div>
+
+        <!-- Exit compass arrow -->
+        <div id="hud-exit-arrow">
+            <div id="hud-exit-arrow-icon">▲</div>
+            <span id="hud-exit-dist">--</span>
+            <span class="hud-exit-label">EXIT</span>
+        </div>
+
+        <!-- Exit lock indicator (hidden by default) -->
+        <div id="hud-exit-lock" class="hud-hidden"></div>
+
+        <!-- Power-up status (hidden by default) -->
+        <div id="hud-powerup" class="hud-hidden">
+            <span id="hud-powerup-name">EMP</span>
+            <span id="hud-powerup-timer"></span>
+        </div>
+
+        <!-- Safe zone badge (hidden by default) -->
+        <div id="hud-safe" class="hud-hidden">ZONE SÛRE</div>
+
+        <!-- Dash cooldown indicator -->
+        <div id="hud-dash" class="dash-ready">
+            <svg viewBox="0 0 44 44" class="dash-ring-svg">
+                <circle cx="22" cy="22" r="18" class="dash-ring-bg" />
+                <circle cx="22" cy="22" r="18" id="hud-dash-ring" class="dash-ring-fill" />
+            </svg>
+            <span id="hud-dash-label" class="dash-label">DASH</span>
+        </div>
+    </div>
+
+    <!-- Dev/jury mode badge -->
+    <div id="hud-dev-badge">★ MODE JURY ACTIF</div>
+
+    <!-- Reinforcement wave alert (hidden by default) -->
+    <div id="hud-wave-alert" class="hud-hidden"></div>
+
+    <!-- ===== LEVEL INTRO OVERLAY ===== -->
+    <div id="level-intro" class="hidden">
+        <div class="level-intro-content">
+            <div class="level-intro-header">
+                <span id="level-intro-num">LVL 01</span>
+                <span id="level-intro-name">SECTEUR</span>
+            </div>
+            <h1 id="level-intro-title"></h1>
+            <p id="level-intro-desc"></p>
+            <div id="level-intro-icon"></div>
+            <div class="level-intro-foot">
+                <span class="level-intro-foot-line"></span>
+                <span class="level-intro-foot-label">INITIALISATION</span>
+                <span class="level-intro-foot-line"></span>
+            </div>
+        </div>
+        <div class="level-intro-scanlines"></div>
+    </div>
+
+    <!-- New HUD styles -->
+    <style>
+        #hud-timer {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-top: 8px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .hud-timer-label {
+            font-size: 9px;
+            letter-spacing: 2px;
+            color: rgba(var(--accent-rgb), 0.55);
+            text-transform: uppercase;
+        }
+        #hud-timer-value {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: rgba(var(--accent-rgb), 0.95);
+            text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.5);
+            transition: color 0.3s;
+        }
+
+        #hud-beat {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            margin-top: 10px;
+        }
+        #hud-beat-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(var(--accent-rgb), 0.3);
+            border: 1.5px solid rgba(var(--accent-rgb), 0.6);
+            transition: transform 0.05s;
+        }
+        #hud-beat-dot.beat-active {
+            animation: beat-flash 0.25s ease-out forwards;
+        }
+        @keyframes beat-flash {
+            0%   { background: rgba(var(--accent-rgb), 1);   box-shadow: 0 0 14px rgba(var(--accent-rgb), 1); }
+            100% { background: rgba(var(--accent-rgb), 0.3); box-shadow: none; }
+        }
+        #hud-beat-bpm {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            color: rgba(var(--accent-rgb), 0.5);
+            letter-spacing: 2px;
+        }
+
+        #hud-exit-arrow {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            margin-top: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+        #hud-exit-arrow-icon {
+            font-size: 20px;
+            color: rgba(var(--accent-rgb), 0.85);
+            text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6);
+            display: inline-block;
+            transition: transform 0.15s;
+            line-height: 1;
+        }
+        #hud-exit-dist {
+            font-size: 10px;
+            color: rgba(var(--accent-rgb), 0.55);
+            letter-spacing: 1px;
+        }
+        .hud-exit-label {
+            font-size: 8px;
+            color: rgba(var(--accent-rgb), 0.35);
+            letter-spacing: 2px;
+        }
+
+        #hud-powerup {
+            margin-top: 10px;
+            font-family: 'Orbitron', sans-serif;
+            text-align: right;
+            padding: 5px 8px;
+            border: 1px solid rgba(var(--accent-rgb), 0.4);
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 3px;
+        }
+        #hud-powerup-name {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            display: block;
+        }
+        #hud-powerup-timer {
+            font-size: 11px;
+            color: rgba(255,255,255,0.5);
+            display: block;
+        }
+
+        #hud-safe {
+            margin-top: 8px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #00d4ff;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+            padding: 4px 8px;
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            background: rgba(0, 20, 40, 0.6);
+            border-radius: 3px;
+            animation: safe-pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes safe-pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Dash cooldown HUD */
+        #hud-dash {
+            position: relative;
+            width: 48px;
+            height: 48px;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .dash-ring-svg {
+            position: absolute;
+            width: 48px;
+            height: 48px;
+            transform: rotate(-90deg);
+        }
+        .dash-ring-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.08);
+            stroke-width: 3;
+        }
+        .dash-ring-fill {
+            fill: none;
+            stroke: rgba(0, 229, 255, 0.7);
+            stroke-width: 3;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+        .dash-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 9px;
+            letter-spacing: 1px;
+            color: rgba(0, 229, 255, 0.6);
+            z-index: 1;
+            text-align: center;
+            pointer-events: none;
+        }
+        #hud-dash.dash-ready .dash-ring-fill {
+            stroke: rgba(0, 229, 255, 0.9);
+            filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.7));
+        }
+        #hud-dash.dash-ready .dash-label {
+            color: #00e5ff;
+            text-shadow: 0 0 8px rgba(0, 229, 255, 0.8);
+            animation: dash-glow 1.8s ease-in-out infinite;
+        }
+        #hud-dash.dash-cooldown .dash-ring-fill {
+            stroke: rgba(255, 255, 255, 0.2);
+            filter: none;
+        }
+        #hud-dash.dash-cooldown .dash-label {
+            color: rgba(255, 255, 255, 0.35);
+            text-shadow: none;
+        }
+        @keyframes dash-glow {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .hud-hidden { display: none !important; }
+
+        /* Exit lock indicator */
+        #hud-exit-lock {
+            margin-top: 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: #ff4466;
+            text-shadow: 0 0 8px rgba(255, 60, 90, 0.6);
+            padding: 4px 8px;
+            border: 1px solid rgba(255, 60, 90, 0.5);
+            background: rgba(40, 0, 10, 0.5);
+            border-radius: 2px;
+            text-align: right;
+            animation: lock-pulse 1.4s ease-in-out infinite;
+        }
+        @keyframes lock-pulse {
+            0%, 100% { opacity: 0.65; }
+            50%      { opacity: 1; }
+        }
+        #hud-exit-lock.unlocked {
+            color: #00ff88;
+            border-color: rgba(0, 255, 136, 0.55);
+            background: rgba(0, 30, 15, 0.55);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.7);
+            animation: none;
+        }
+
+        /* Reinforcement wave alert */
+        #hud-wave-alert {
+            position: fixed;
+            top: 18%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 6px;
+            color: #ff2244;
+            text-shadow: 0 0 18px rgba(255, 40, 80, 0.9);
+            padding: 14px 28px;
+            border: 2px solid #ff2244;
+            background: rgba(40, 0, 10, 0.75);
+            border-radius: 4px;
+            z-index: 1200;
+            animation: wave-flash 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            pointer-events: none;
+        }
+        @keyframes wave-flash {
+            0%   { opacity: 0; transform: translateX(-50%) scale(0.7); }
+            100% { opacity: 1; transform: translateX(-50%) scale(1); }
+        }
+
+        /* Mode Jury panel */
+        .menu-btn-jury {
+            border-color: rgba(255, 200, 0, 0.5) !important;
+            color: #ffcc00 !important;
+            text-shadow: 0 0 8px rgba(255, 200, 0, 0.4);
+        }
+        .menu-btn-jury:hover {
+            background: rgba(255, 200, 0, 0.08) !important;
+            box-shadow: 0 0 14px rgba(255, 200, 0, 0.35);
+        }
+        .jury-intro {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.55);
+            line-height: 1.5;
+            margin: 0 0 6px;
+        }
+        .jury-row {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 10px 0;
+        }
+        .jury-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            letter-spacing: 2px;
+            color: #ffcc00;
+            cursor: pointer;
+        }
+        .jury-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #ffcc00;
+            cursor: pointer;
+        }
+        .jury-desc {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.45);
+            padding-left: 26px;
+        }
+        .jury-select {
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 200, 0, 0.4);
+            color: #ffcc00;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            letter-spacing: 1.5px;
+            padding: 6px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            outline: none;
+        }
+        .jury-select:focus {
+            border-color: #ffcc00;
+            box-shadow: 0 0 10px rgba(255, 200, 0, 0.4);
+        }
+        .jury-launch {
+            margin-top: 10px;
+            width: 100%;
+            border-color: rgba(255, 200, 0, 0.6) !important;
+            color: #ffcc00 !important;
+        }
+
+        /* Dev badge HUD */
+        #hud-dev-badge {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: #ffcc00;
+            background: rgba(40, 30, 0, 0.7);
+            border: 1px solid rgba(255, 200, 0, 0.5);
+            padding: 4px 8px;
+            border-radius: 3px;
+            z-index: 100;
+            display: none;
+            text-shadow: 0 0 8px rgba(255, 200, 0, 0.6);
+        }
+        #hud-dev-badge.active {
+            display: block;
+            animation: dev-pulse 2s ease-in-out infinite;
+        }
+        @keyframes dev-pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        /* Pause Menu */
+        #pause-menu {
+            position: fixed;
+            inset: 0;
+            background: rgba(2, 2, 8, 0.85);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+        #pause-menu.visible {
+            display: flex;
+        }
+        .pause-box {
+            text-align: center;
+            padding: 40px 50px;
+            border: 1px solid rgba(var(--accent-rgb), 0.3);
+            background: rgba(5, 5, 15, 0.7);
+            border-radius: 4px;
+            box-shadow: 0 0 40px rgba(var(--accent-rgb), 0.1),
+                        inset 0 0 30px rgba(0, 0, 0, 0.4);
+        }
+        .pause-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: 12px;
+            color: rgba(var(--accent-rgb), 0.95);
+            text-shadow: 0 0 20px rgba(var(--accent-rgb), 0.6),
+                         0 0 40px rgba(var(--accent-rgb), 0.3);
+            margin-bottom: 6px;
+        }
+        .pause-subtitle {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: rgba(var(--accent-rgb), 0.4);
+            margin-bottom: 30px;
+        }
+        .pause-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 220px;
+        }
+        .btn-pause {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            letter-spacing: 3px;
+            padding: 12px 20px;
+            border: 1px solid rgba(var(--accent-rgb), 0.4);
+            background: rgba(var(--accent-rgb), 0.04);
+            color: rgba(var(--accent-rgb), 0.85);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-radius: 2px;
+        }
+        .btn-pause:hover {
+            background: rgba(var(--accent-rgb), 0.12);
+            border-color: rgba(var(--accent-rgb), 0.7);
+            box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.3);
+            text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.6);
+        }
+        .btn-resume {
+            border-color: rgba(var(--accent-rgb), 0.6);
+            color: rgba(var(--accent-rgb), 1);
+            font-weight: 700;
+        }
+        .btn-quit {
+            border-color: rgba(255, 60, 60, 0.4);
+            color: rgba(255, 100, 100, 0.75);
+        }
+        .btn-quit:hover {
+            background: rgba(255, 40, 40, 0.1);
+            border-color: rgba(255, 60, 60, 0.7);
+            box-shadow: 0 0 15px rgba(255, 40, 40, 0.3);
+            color: #ff6666;
+        }
+
+        /* Bouton ACCUEIL du leaderboard */
+        .btn-home {
+            background: rgba(255, 255, 255, 0.04) !important;
+            border-color: rgba(255, 255, 255, 0.25) !important;
+            color: rgba(255, 255, 255, 0.55) !important;
+        }
+        .btn-home:hover {
+            background: rgba(255, 255, 255, 0.08) !important;
+            border-color: rgba(255, 255, 255, 0.5) !important;
+            color: rgba(255, 255, 255, 0.85) !important;
+        }
+
+        /* --- Level Intro Overlay --- */
+        #level-intro {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(ellipse at center, rgba(8, 5, 18, 0.92) 0%, rgba(0, 0, 0, 0.96) 80%);
+            backdrop-filter: blur(10px);
+            z-index: 1500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            transition: opacity 0.5s ease-out;
+            overflow: hidden;
+        }
+        #level-intro.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        /* Scanline overlay for terminal feel */
+        .level-intro-scanlines {
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(var(--accent-rgb), 0.04) 0px,
+                rgba(var(--accent-rgb), 0.04) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            animation: scanlines-drift 8s linear infinite;
+        }
+        @keyframes scanlines-drift {
+            0%   { transform: translateY(0); }
+            100% { transform: translateY(3px); }
+        }
+        .level-intro-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 36px 56px;
+            min-width: 480px;
+            max-width: 680px;
+            border: 1px solid rgba(var(--accent-rgb), 0.35);
+            background: rgba(0, 5, 12, 0.55);
+            border-radius: 4px;
+            box-shadow:
+                0 0 50px rgba(var(--accent-rgb), 0.18),
+                inset 0 0 30px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            opacity: 0;
+            animation: introPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes introPop {
+            0%   { transform: scale(0.85); opacity: 0; filter: blur(6px); }
+            60%  { opacity: 1; filter: blur(0); }
+            100% { transform: scale(1); opacity: 1; filter: blur(0); }
+        }
+        /* Corner accents */
+        .level-intro-content::before,
+        .level-intro-content::after {
+            content: '';
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-color: rgba(var(--accent-rgb), 0.85);
+            border-style: solid;
+        }
+        .level-intro-content::before {
+            top: -2px; left: -2px;
+            border-width: 2px 0 0 2px;
+        }
+        .level-intro-content::after {
+            bottom: -2px; right: -2px;
+            border-width: 0 2px 2px 0;
+        }
+        .level-intro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 1px dashed rgba(var(--accent-rgb), 0.3);
+            font-family: 'Orbitron', sans-serif;
+        }
+        #level-intro-num {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 4px;
+            color: rgba(var(--accent-rgb), 0.95);
+            text-shadow: 0 0 10px rgba(var(--accent-rgb), 0.7);
+        }
+        #level-intro-name {
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: rgba(var(--accent-rgb), 0.6);
+            text-transform: uppercase;
+        }
+        #level-intro-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 38px;
+            font-weight: 900;
+            letter-spacing: 6px;
+            color: #fff;
+            margin: 0 0 12px 0;
+            text-shadow:
+                0 0 20px rgba(var(--accent-rgb), 0.9),
+                0 0 40px rgba(var(--accent-rgb), 0.5);
+            animation: title-glitch 0.45s steps(4) 0.15s both;
+        }
+        @keyframes title-glitch {
+            0%   { transform: translate(0, 0);   opacity: 0; }
+            25%  { transform: translate(-2px, 1px); opacity: 0.6; }
+            50%  { transform: translate(2px, -1px); opacity: 0.9; }
+            75%  { transform: translate(-1px, 0); opacity: 1; }
+            100% { transform: translate(0, 0); opacity: 1; }
+        }
+        #level-intro-desc {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 15px;
+            line-height: 1.55;
+            color: #d8d8e0;
+            margin: 16px 0 24px 0;
+            letter-spacing: 1.5px;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.8);
+            animation: desc-fade 0.6s ease-out 0.35s both;
+        }
+        @keyframes desc-fade {
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        #level-intro-icon {
+            margin: 26px 0 18px;
+            display: flex;
+            justify-content: center;
+            animation: icon-rise 0.6s ease-out 0.55s both;
+        }
+        @keyframes icon-rise {
+            from { opacity: 0; transform: scale(0.6); }
+            to   { opacity: 1; transform: scale(1); }
+        }
+        .level-intro-foot {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: rgba(var(--accent-rgb), 0.55);
+            animation: foot-fade 0.5s ease-out 0.75s both;
+        }
+        @keyframes foot-fade {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        .level-intro-foot-label {
+            white-space: nowrap;
+            animation: foot-blink 1.4s ease-in-out infinite;
+        }
+        @keyframes foot-blink {
+            0%, 100% { opacity: 0.5; }
+            50%      { opacity: 1;   color: rgba(var(--accent-rgb), 0.9); }
+        }
+        .level-intro-foot-line {
+            flex: 1;
+            max-width: 90px;
+            height: 1px;
+            background: linear-gradient(
+                to right,
+                transparent,
+                rgba(var(--accent-rgb), 0.4),
+                transparent
+            );
+        }
+        
+        /* Icon designs */
+        .icon-door {
+            width: 50px; height: 70px;
+            border: 3px solid #00ffcc;
+            border-radius: 5px 5px 0 0;
+            box-shadow: 0 0 15px rgba(0,255,204,0.5), inset 0 0 15px rgba(0,255,204,0.2);
+            position: relative;
+            animation: doorPulse 2s infinite alternate;
+        }
+        .icon-door::after {
+            content: ''; position: absolute;
+            right: 8px; top: 35px;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: #00ffcc;
+            box-shadow: 0 0 5px #00ffcc;
+        }
+        @keyframes doorPulse {
+            from { box-shadow: 0 0 5px rgba(0,255,204,0.5), inset 0 0 5px rgba(0,255,204,0.2); }
+            to { box-shadow: 0 0 25px rgba(0,255,204,1), inset 0 0 20px rgba(0,255,204,0.5); }
+        }
+
+        .icon-ground-drone {
+            width: 40px; height: 20px;
+            background: transparent;
+            border: 3px solid #ff0055;
+            border-radius: 20px 20px 5px 5px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(255,0,85,0.5);
+        }
+        .icon-ground-drone::before {
+            content: ''; position: absolute;
+            bottom: -20px; left: -10px;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-bottom: 40px solid rgba(255,0,85,0.4);
+            transform-origin: top center;
+            animation: scannerSweep 2s ease-in-out infinite alternate;
+            filter: blur(2px);
+        }
+        @keyframes scannerSweep {
+            0% { transform: rotate(-30deg); }
+            100% { transform: rotate(30deg); }
+        }
+    </style>
+
+    <!-- ===== Game Over ===== -->
+    <div id="game-over">
+        <div class="glitch" data-text="SYSTEM PURGE">SYSTEM PURGE</div>
+        <div class="subtitle">DEVIANT DETECTED</div>
+    </div>
+
+    <!-- ===== Score Entry ===== -->
+    <div id="score-entry">
+        <div class="score-box">
+            <div class="score-title">PARTIE TERMINÉE</div>
+            <div id="score-level-reached" class="score-level">NIVEAU 1 ATTEINT</div>
+            <p class="score-prompt">Entrez votre nom pour rejoindre le classement :</p>
+            <input type="text" id="score-name-input" maxlength="20"
+                   placeholder="VOTRE NOM" autocomplete="off" spellcheck="false" />
+            <div class="score-buttons">
+                <button class="btn-score btn-save" onclick="
+                    const name = document.getElementById('score-name-input').value;
+                    if (window.__DZ_LM__) { 
+                        window.__DZ_LM__.saveScore(name).then(() => window.__DZ_LM__.showLeaderboard()); 
+                    }
+                ">SAUVEGARDER</button>
+                <button class="btn-score btn-skip" onclick="
+                    if (window.__DZ_LM__) window.__DZ_LM__.showLeaderboard();
+                ">PASSER</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Leaderboard (in-game, post game-over) ===== -->
+    <div id="leaderboard">
+        <div class="lb-box">
+            <div class="lb-title">CLASSEMENT</div>
+            <ul id="lb-list"></ul>
+            <div class="lb-buttons">
+                <!-- Relance directe: sessionStorage flag skips the menu on reload -->
+                <button class="btn-lb btn-replay" onclick="
+                    sessionStorage.setItem('dz_quick_start','1');
+                    location.reload();
+                ">REJOUER</button>
+                <button class="btn-lb btn-home" onclick="
+                    location.reload();
+                ">ACCUEIL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Pause Menu ===== -->
+    <div id="pause-menu">
+        <div class="pause-box">
+            <div class="pause-title" data-text="PAUSE">PAUSE</div>
+            <div class="pause-subtitle">SYSTÈME EN VEILLE</div>
+            <div class="pause-buttons">
+                <button class="btn-pause btn-resume" id="btn-resume">REPRENDRE</button>
+                <button class="btn-pause btn-restart" id="btn-restart">RECOMMENCER</button>
+                <button class="btn-pause btn-quit" id="btn-quit">ACCUEIL</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== Level Transition ===== -->
+    <div id="level-transition">
+        <div class="transition-content">
+            <div class="transition-sector">NOUVEAU SECTEUR</div>
+            <div id="transition-accent-line" class="transition-accent"></div>
+            <div id="transition-level-num" class="transition-num">LEVEL 2</div>
+            <div id="transition-level-name" class="transition-name">AMBER GRID</div>
+            <div class="transition-sub">SYSTÈME MIS À JOUR</div>
+        </div>
+    </div>
+
+    <!-- ===== Menu Logic ===== -->
+    <script>
+        // ── Spawn floating data-particles ──────────────────────────────────────
+        (function spawnParticles() {
+            const container = document.getElementById('menu-particles');
+            if (!container) return;
+            const colors = ['0,255,255', '180,0,255', '255,0,200', '0,200,255'];
+            for (let i = 0; i < 35; i++) {
+                const p = document.createElement('span');
+                p.className = 'menu-particle';
+                p.style.cssText = [
+                    `left:${Math.random() * 100}%`,
+                    `width:${1 + Math.random() * 2.5}px`,
+                    `height:${1 + Math.random() * 2.5}px`,
+                    `animation-delay:${(Math.random() * 12).toFixed(2)}s`,
+                    `animation-duration:${(8 + Math.random() * 8).toFixed(2)}s`,
+                    `background:rgba(${colors[Math.floor(Math.random() * colors.length)]},${(0.35 + Math.random() * 0.45).toFixed(2)})`,
+                ].join(';');
+                container.appendChild(p);
+            }
+        })();
+
+        // ── Menu navigation ────────────────────────────────────────────────────
+        async function menuAction(action) {
+            if (action === 'play') {
+                const menu = document.getElementById('main-menu');
+                menu.classList.add('fade-out');
+                setTimeout(() => {
+                    menu.style.display = 'none';
+                    if (window.__DZ_START__) window.__DZ_START__();
+                }, 750);
+                return;
+            }
+
+            // Hide main content, show panel
+            document.getElementById('menu-content').classList.add('slide-out');
+
+            if (action === 'scores') {
+                const list = document.getElementById('menu-lb-list');
+                list.innerHTML = '<li class="lb-empty">Chargement...</li>';
+                showPanel('panel-scores');
+
+                try {
+                    const response = await fetch('/api/scores');
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const scores = await response.json();
+
+                    list.innerHTML = scores.length === 0
+                        ? '<li class="lb-empty">Aucun score enregistré</li>'
+                        : scores.map((s, i) =>
+                            `<li class="lb-row">
+                                <span class="lb-rank">#${i + 1}</span>
+                                <span class="lb-name">${s.name}</span>
+                                <span class="lb-level">LVL ${s.level}</span>
+                            </li>`
+                        ).join('');
+                } catch (error) {
+                    console.error('Failed to fetch scores:', error);
+                    list.innerHTML = '<li class="lb-empty">Erreur de chargement des scores</li>';
+                }
+            } else if (action === 'howto') {
+                showPanel('panel-howto');
+            } else if (action === 'credits') {
+                showPanel('panel-credits');
+            } else if (action === 'jury') {
+                showPanel('panel-jury');
+            }
+        }
+
+        // ── Jury mode launcher ────────────────────────────────────────────────
+        function launchJuryMode() {
+            const godMode      = document.getElementById('jury-godmode').checked;
+            const timerInfini  = document.getElementById('jury-notimer').checked;
+            const startLevel   = parseInt(document.getElementById('jury-level').value, 10) || 1;
+
+            window.__DZ_JURY__ = { godMode, timerInfini, startLevel };
+
+            if (godMode || timerInfini) {
+                const badge = document.getElementById('hud-dev-badge');
+                if (badge) badge.classList.add('active');
+            }
+
+            const menu = document.getElementById('main-menu');
+            menu.classList.add('fade-out');
+            setTimeout(() => {
+                menu.style.display = 'none';
+                if (window.__DZ_START__) window.__DZ_START__();
+            }, 600);
+        }
+
+        function showPanel(id) {
+            setTimeout(() => {
+                document.getElementById(id).classList.add('active');
+            }, 200);
+        }
+
+        function menuBack() {
+            document.querySelectorAll('.menu-panel').forEach(p => p.classList.remove('active'));
+            const content = document.getElementById('menu-content');
+            content.classList.remove('slide-out');
+        }
+    </script>
+
+    <!-- Entry Point -->
+    <script type="module" src="main.js?v=10"></script>
+</body>
+</html>

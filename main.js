@@ -10,12 +10,12 @@ const T = {
     claim: "Je conçois des interfaces qu'on comprend du premier coup.",
     facts: "Étudiant en M2 IHM à l'Université Côte d'Azur. Je cherche un <strong>stage UX de 6 mois à partir du 1<sup>er</sup> mars 2027</strong>, à Nice ou Sophia Antipolis.",
     ctaProjects: "Voir les projets", ctaCv: "CV en PDF", skipIntro: "Passer l'intro",
-    gridKicker: "Grille de départ", h2p: "Six projets, de l'entretien au produit en ligne.",
+    gridKicker: "Grille de départ", h2p: "Sept projets, de l'entretien au produit en ligne.",
     parcKicker: "Parc fermé", h2c: "On en parle ?",
     fAvail: "Disponible", fAvailV: "Du 1er mars au 31 août 2027", fZone: "Zone", fZoneV: "Côte d'Azur, véhiculé", fSchool: "Formation", fSchoolV: "M2 IHM, Université Côte d'Azur",
     mail: "Écrire à amirbenyahia550@gmail.com",
     live: "Démo en direct", newTab: "Ouvrir dans un onglet", close: "Fermer",
-    demo: "Voir la démo", figma: "Maquette Figma", repo: "Code source", demoAria: (t) => `Voir la démo : ${t}`,
+    demo: "Voir la démo", figma: "Maquette Figma", repo: "Code source", video: "Vidéo", techKicker: "Côté technique", tech1: "Microservices sécurisés", tech2: "Algorithmes de flots", tech3: "Reconnaissance faciale", techLead: "Des projets sans angle UX, mais qui montrent que je sais ce qui se passe sous l'interface.", demoAria: (t) => `Voir la démo : ${t}`,
     shotAlt: (t) => `Capture de la démo : ${t}`,
   },
   en: {
@@ -24,12 +24,12 @@ const T = {
     claim: "I design interfaces people get the first time.",
     facts: "M2 student in Human-Computer Interaction at Université Côte d'Azur. I'm looking for a <strong>6-month UX internship starting 1 March 2027</strong>, in Nice or Sophia Antipolis.",
     ctaProjects: "See the projects", ctaCv: "Résumé (PDF)", skipIntro: "Skip intro",
-    gridKicker: "Starting grid", h2p: "Six projects, from interviews to shipped product.",
+    gridKicker: "Starting grid", h2p: "Seven projects, from interviews to shipped product.",
     parcKicker: "Parc fermé", h2c: "Let's talk",
     fAvail: "Available", fAvailV: "1 March to 31 August 2027", fZone: "Area", fZoneV: "Côte d'Azur, has a car", fSchool: "Studies", fSchoolV: "M2 HCI, Université Côte d'Azur",
     mail: "Email amirbenyahia550@gmail.com",
     live: "Live demo", newTab: "Open in a new tab", close: "Close",
-    demo: "See the demo", figma: "Figma file", repo: "Source code", demoAria: (t) => `See the demo: ${t}`,
+    demo: "See the demo", figma: "Figma file", repo: "Source code", video: "Video", techKicker: "Under the hood", tech1: "Secured microservices", tech2: "Network flow algorithms", tech3: "Face recognition", techLead: "Projects with no UX angle, but they show I know what happens beneath the interface.", demoAria: (t) => `See the demo: ${t}`,
     shotAlt: (t) => `Screenshot of the demo: ${t}`,
   },
 };
@@ -48,7 +48,7 @@ function applyLang() {
 $("#lang").addEventListener("click", () => { L = L === "fr" ? "en" : "fr"; try { localStorage.setItem("ab-lang", L); } catch (e) {} applyLang(); });
 
 /* ---------- projects ---------- */
-const ORDER = ["ceihm", "flux", "room", "spotify", "sampler", "maze"];
+const ORDER = ["ceihm", "dz", "flux", "room", "spotify", "maze", "sampler"];
 function renderRail() {
   $("#rail").innerHTML = ORDER.map((id) => {
     const x = P[id];
@@ -60,7 +60,7 @@ function renderRail() {
       <figure class="shot" data-open="${id}" aria-hidden="true"><img src="img/${id}.webp" srcset="img/${id}-s.webp 800w, img/${id}.webp 1600w" sizes="(min-width:900px) 50vw, 100vw" alt="" loading="lazy" decoding="async" width="1600" height="1000"></figure>
       <div class="info">
         <p class="pos" aria-hidden="true"><small>P</small>${pos}</p>
-        <p class="yr">${x.y}</p>
+        <p class="yr">${x.y}${x.award ? ` <strong class="award">${x.award[L]}</strong>` : ""}</p>
         <h3>${x.t[L]}</h3>
         <p class="rh">${x.rh[L]}</p>
         <p class="ds">${x.design[L]}</p>
@@ -76,7 +76,7 @@ let back = null;
 function openProject(id, from) {
   const x = P[id];
   back = from;
-  $("#shY").textContent = x.y;
+  $("#shY").textContent = x.award ? `${x.y} · ${x.award[L]}` : x.y;
   $("#shT").textContent = x.t[L];
   $("#shRh").textContent = x.rh[L];
   $("#shDesign").textContent = x.design[L];
@@ -86,6 +86,7 @@ function openProject(id, from) {
   const links = [];
   if (x.figma) links.push(`<a href="${x.figma}" target="_blank" rel="noopener">${t("figma")}</a>`);
   if (x.repo) links.push(`<a href="${x.repo}" target="_blank" rel="noopener">${t("repo")}</a>`);
+  if (x.video) links.push(`<a href="${x.video}" target="_blank" rel="noopener">${t("video")}</a>`);
   $("#shLinks").innerHTML = links.join("");
   $("#shFrame").innerHTML = `<iframe src="${x.live}" title="${t("live")} : ${x.t[L]}"></iframe>`;
   $("#shTab").href = `${x.live}`;

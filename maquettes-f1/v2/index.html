@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Amir Benyahia, UX research &amp; design</title>
+<meta name="description" content="Amir Benyahia, étudiant en M2 IHM, cherche un stage UX de 6 mois à partir de mars 2027 sur la Côte d'Azur.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,300..900;1,62..125,400..700&display=swap">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{"imports":{"three":"./vendor/three.module.min.js"}}</script>
+</head>
+<body>
+<a class="skip" href="#samedi" data-i="skip">Aller directement aux projets</a>
+
+<header class="top">
+  <a class="who" href="#vendredi">Amir Benyahia</a>
+  <nav aria-label="Principale" data-i-aria="navLabel">
+    <a href="#samedi" data-i="navProjects">Projets</a>
+    <a href="../../cv.pdf" target="_blank" rel="noopener" data-i="navCv">CV</a>
+    <a href="#parc" data-i="navContact">Contact</a>
+  </nav>
+  <div class="tools">
+    <button type="button" id="sound" class="tool" aria-pressed="false"><span class="dot" aria-hidden="true"></span><span data-i="soundOff">Son coupé</span></button>
+    <button type="button" id="lang" class="tool" lang="en">English</button>
+  </div>
+</header>
+
+<main>
+  <!-- VENDREDI: hero -->
+  <section id="vendredi" class="hero" aria-labelledby="h1">
+    <div class="stage" id="studio" aria-hidden="true"></div>
+    <div class="hero-copy">
+      <p class="day" data-i="friDay">Vendredi, essais libres</p>
+      <h1 id="h1" class="stretch" data-i="h1">Je conçois des interfaces qu'on comprend du premier coup.</h1>
+      <p class="lede" data-i-html="lede">Étudiant en M2 IHM à l'Université Côte d'Azur. Je cherche un <strong>stage UX de 6 mois à partir du 1<sup>er</sup> mars 2027</strong>, à Nice ou Sophia Antipolis.</p>
+      <div class="ctas">
+        <a class="btn go" href="#samedi" data-i="ctaProjects">Voir mes projets</a>
+        <a class="btn ghost" href="../../cv.pdf" target="_blank" rel="noopener" data-i="ctaCv">Télécharger mon CV (PDF)</a>
+      </div>
+      <p class="hint" data-i="dragHint">La maquette se tourne à la souris ou au doigt.</p>
+    </div>
+    <ol class="weekend" aria-label="Le week-end" data-i-aria="weekendLabel">
+      <li><a href="#vendredi" class="on"><b data-i="w1">Vendredi</b><span data-i="w1s">Qui je suis</span></a></li>
+      <li><a href="#samedi"><b data-i="w2">Samedi</b><span data-i="w2s">Mes projets</span></a></li>
+      <li><a href="#dimanche"><b data-i="w3">Dimanche</b><span data-i="w3s">Le tour</span></a></li>
+      <li><a href="#parc"><b data-i="w4">Parc fermé</b><span data-i="w4s">CV et contact</span></a></li>
+    </ol>
+  </section>
+
+  <!-- SAMEDI: projects -->
+  <section id="samedi" class="quali" aria-labelledby="h2q">
+    <p class="day" data-i="satDay">Samedi, qualifications</p>
+    <h2 id="h2q" class="stretch" data-i="h2q">Six projets, de l'entretien au produit en ligne.</h2>
+    <ol class="grid-list" id="projects"></ol>
+  </section>
+
+  <!-- DIMANCHE: lights + lap -->
+  <section id="dimanche" class="race" aria-labelledby="h2r">
+    <p class="day" data-i="sunDay">Dimanche, la course</p>
+    <h2 id="h2r" class="stretch" data-i="h2r">Les mêmes projets, en un tour de circuit.</h2>
+    <p class="lede" data-i="raceLede">Un circuit imaginaire au bord de la baie. Chaque portique ouvre un projet. Compter une minute, et rien d'obligatoire : tout est déjà dans la liste au-dessus.</p>
+    <div class="gantry-lights" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <p class="status" id="lightsStatus" role="status" aria-live="polite"></p>
+    <div class="ctas">
+      <button type="button" class="btn go" id="start" data-i="start">Prendre le départ</button>
+      <span class="keys" data-i="keys">Accélérer : ↑ ou espace. Freiner : ↓.</span>
+    </div>
+  </section>
+
+  <!-- PARC FERMÉ -->
+  <section id="parc" class="parc" aria-labelledby="h2p">
+    <p class="day" data-i="parcDay">Parc fermé</p>
+    <h2 id="h2p" class="stretch" data-i="h2p">Parlons de votre équipe.</h2>
+    <dl class="facts">
+      <div><dt data-i="fAvail">Disponible</dt><dd data-i="fAvailV">Du 1er mars au 31 août 2027</dd></div>
+      <div><dt data-i="fZone">Zone</dt><dd data-i="fZoneV">Côte d'Azur, véhiculé</dd></div>
+      <div><dt data-i="fSchool">Formation</dt><dd data-i="fSchoolV">M2 IHM, Université Côte d'Azur</dd></div>
+    </dl>
+    <div class="ctas">
+      <a class="btn go" href="mailto:amirbenyahia550@gmail.com" data-i="mail">Écrire à amirbenyahia550@gmail.com</a>
+      <a class="btn ghost" href="../../cv.pdf" target="_blank" rel="noopener" data-i="ctaCv">Télécharger mon CV (PDF)</a>
+      <a class="btn ghost" href="https://github.com/Amir-Benyahia" target="_blank" rel="noopener">GitHub</a>
+    </div>
+    <p class="mk" data-i="mk">Maquette de direction, version 2. Le site en ligne n'a pas changé.</p>
+  </section>
+</main>
+
+<!-- LAP overlay -->
+<div class="lap" id="lap" hidden role="dialog" aria-modal="true" aria-labelledby="lapTitle">
+  <div class="lap-stage" id="lapStage"></div>
+  <div class="lights-big" id="lightsBig" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+  <h2 id="lapTitle" class="sr" data-i="lapTitle">Tour de circuit</h2>
+  <div class="hud-top">
+    <p class="sector"><span id="hudSector">Secteur 1</span><span id="hudTime" class="time">0:00.0</span></p>
+    <button type="button" class="tool dark" id="quit" data-i="quit">Quitter le tour</button>
+  </div>
+  <p class="speed" aria-hidden="true"><span id="hudSpeed">0</span><small>km/h</small></p>
+  <div class="card" id="card" hidden>
+    <p class="card-k" id="cardK"></p>
+    <p class="card-t" id="cardT"></p>
+    <button type="button" class="btn go" id="cardOpen" data-i="open">Ouvrir le projet</button>
+  </div>
+  <button type="button" class="pedal" id="pedal" data-i="pedal">Accélérer</button>
+  <p class="sr" id="lapLive" role="status" aria-live="polite"></p>
+  <div class="finish" id="finish" hidden>
+    <p class="day" data-i="finishDay">Drapeau à damier</p>
+    <p class="finish-t" id="finishT"></p>
+    <p id="finishR"></p>
+    <div class="ctas">
+      <button type="button" class="btn go" id="again" data-i="again">Refaire un tour</button>
+      <a class="btn ghost light" href="#parc" id="toParc" data-i="toParc">Voir le CV et le contact</a>
+    </div>
+  </div>
+</div>
+
+<!-- Project sheet -->
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="shT">
+  <section class="demo"><header><span id="shLive" data-i="live">Démo en direct</span><a id="shTab" target="_blank" rel="noopener" data-i="newTab">Ouvrir dans un onglet</a></header><div id="shFrame"></div></section>
+  <aside class="side">
+    <button type="button" class="tool" id="shClose" data-i="close">Fermer</button>
+    <p class="day" id="shY"></p>
+    <h2 id="shT" class="stretch"></h2>
+    <p id="shRh" class="strong"></p>
+    <p id="shDesign"></p>
+    <p id="shDev" class="muted"></p>
+    <ul id="shDetail" class="detail"></ul>
+    <p id="shNote" class="muted"></p>
+    <p class="links" id="shLinks"></p>
+  </aside>
+</div>
+
+<script src="../data.js"></script>
+<script type="module" src="main.js"></script>
+</body>
+</html>

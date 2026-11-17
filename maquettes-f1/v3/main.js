@@ -10,10 +10,10 @@ const T = {
     claim: "Je conçois des interfaces qu'on comprend du premier coup.",
     facts: "Étudiant en M2 IHM à l'Université Côte d'Azur. Je cherche un <strong>stage UX de 6 mois à partir du 1<sup>er</sup> mars 2027</strong>, à Nice ou Sophia Antipolis.",
     ctaProjects: "Voir les projets", ctaCv: "CV en PDF", skipIntro: "Passer l'intro",
-    h2p: "Six projets, de l'entretien au produit en ligne.",
+    gridKicker: "Grille de départ", h2p: "Six projets, de l'entretien au produit en ligne.",
     parcKicker: "Parc fermé", h2c: "On en parle ?",
     fAvail: "Disponible", fAvailV: "Du 1er mars au 31 août 2027", fZone: "Zone", fZoneV: "Côte d'Azur, véhiculé", fSchool: "Formation", fSchoolV: "M2 IHM, Université Côte d'Azur",
-    mail: "Écrire à amirbenyahia550@gmail.com", mk: "Maquette de direction, version 3. Le site en ligne n'a pas changé.",
+    mail: "Écrire à amirbenyahia550@gmail.com",
     live: "Démo en direct", newTab: "Ouvrir dans un onglet", close: "Fermer",
     demo: "Voir la démo", figma: "Maquette Figma", repo: "Code source", demoAria: (t) => `Voir la démo : ${t}`,
     shotAlt: (t) => `Capture de la démo : ${t}`,
@@ -24,10 +24,10 @@ const T = {
     claim: "I design interfaces people get the first time.",
     facts: "M2 student in Human-Computer Interaction at Université Côte d'Azur. I'm looking for a <strong>6-month UX internship starting 1 March 2027</strong>, in Nice or Sophia Antipolis.",
     ctaProjects: "See the projects", ctaCv: "Résumé (PDF)", skipIntro: "Skip intro",
-    h2p: "Six projects, from interviews to shipped product.",
+    gridKicker: "Starting grid", h2p: "Six projects, from interviews to shipped product.",
     parcKicker: "Parc fermé", h2c: "Let's talk",
     fAvail: "Available", fAvailV: "1 March to 31 August 2027", fZone: "Area", fZoneV: "Côte d'Azur, has a car", fSchool: "Studies", fSchoolV: "M2 HCI, Université Côte d'Azur",
-    mail: "Email amirbenyahia550@gmail.com", mk: "Direction mockup, version 3. The live site has not changed.",
+    mail: "Email amirbenyahia550@gmail.com",
     live: "Live demo", newTab: "Open in a new tab", close: "Close",
     demo: "See the demo", figma: "Figma file", repo: "Source code", demoAria: (t) => `See the demo: ${t}`,
     shotAlt: (t) => `Screenshot of the demo: ${t}`,
@@ -55,9 +55,11 @@ function renderRail() {
     const links = [];
     if (x.figma) links.push(`<a class="btn line" href="${x.figma}" target="_blank" rel="noopener">${t("figma")}</a>`);
     else if (x.repo) links.push(`<a class="btn line" href="${x.repo}" target="_blank" rel="noopener">${t("repo")}</a>`);
+    const pos = ORDER.indexOf(id) + 1;
     return `<li class="stand">
       <figure class="shot" data-open="${id}" aria-hidden="true"><img src="img/${id}.webp" srcset="img/${id}-s.webp 800w, img/${id}.webp 1600w" sizes="(min-width:900px) 50vw, 100vw" alt="" loading="lazy" decoding="async" width="1600" height="1000"></figure>
       <div class="info">
+        <p class="pos" aria-hidden="true"><small>P</small>${pos}</p>
         <p class="yr">${x.y}</p>
         <h3>${x.t[L]}</h3>
         <p class="rh">${x.rh[L]}</p>
@@ -127,7 +129,9 @@ function onScroll() {
   raf = requestAnimationFrame(() => {
     raf = 0;
     const p = progress();
-    $("#bar").style.transform = `scaleX(${p})`;
+    const segs = document.querySelectorAll(".sectors span");
+    segs.forEach((sg, i) => { const f = Math.min(1, Math.max(0, p * 3 - i)); sg.firstChild.style.transform = `scaleX(${f})`; sg.classList.toggle("done", f >= 1); });
+    document.querySelector(".sectors").classList.toggle("best", p >= 0.995);
     $("#cur").textContent = Math.min(ORDER.length, 1 + Math.floor(p * ORDER.length * 0.999));
     if (!sec.classList.contains("horizontal")) return;
     const x = -p * maxX;
@@ -171,7 +175,7 @@ function intro() {
     timers.forEach(clearTimeout); cancelAnimationFrame(frame);
     lights.forEach((l) => l.classList.remove("on"));
     spans.forEach((s) => { s.style.transform = ""; s.style.filter = ""; s.style.removeProperty("--w"); });
-    bar.style.transform = ""; grid.style.opacity = ""; grid.style.transform = "";
+    bar.style.clipPath = ""; grid.style.opacity = ""; grid.style.transform = "";
     html.classList.remove("intro");
     try { sessionStorage.setItem("ab-intro", "1"); } catch (e) {}
   };
@@ -195,7 +199,7 @@ function intro() {
         s.style.filter = b > 0.4 ? "url(#nblur)" : "";
       });
       const kb = Math.min(1, (now - t0) / 700);
-      bar.style.transform = `scaleX(${easeOut(kb)})`;
+      bar.style.clipPath = `inset(0 ${(100 - easeOut(kb) * 100).toFixed(2)}% 0 0)`;
       if (now - t0 > D * 0.75) { grid.style.opacity = "1"; grid.style.transform = "none"; }
       if (now - t0 < D + 200) frame = requestAnimationFrame(step); else finish();
     };

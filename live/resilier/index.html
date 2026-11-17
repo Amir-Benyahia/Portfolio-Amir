@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Résilier en un clic ?</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="tabs" role="tablist" aria-label="Sections du projet">
+  <button class="tab" role="tab" id="t-play" aria-controls="p-play" aria-selected="true" type="button"><span class="lg">Essayez de résilier</span><span class="sm">Essayer</span></button>
+  <button class="tab" role="tab" id="t-grid" aria-controls="p-grid" aria-selected="false" type="button"><span class="lg">La grille d'audit</span><span class="sm">Grille</span></button>
+  <button class="tab" role="tab" id="t-res" aria-controls="p-res" aria-selected="false" type="button"><span class="lg">Protocole et résultats</span><span class="sm">Résultats</span></button>
+</nav>
+
+<!-- 1. PLAYABLE DEMO -->
+<section id="p-play" role="tabpanel" aria-labelledby="t-play" class="panel play">
+  <div class="mission" id="mission">
+    <div>
+      <p class="kicker" id="mKicker">Mission</p>
+      <h1 id="mTitle">Vous êtes abonné·e à Abonnix. Résiliez votre abonnement.</h1>
+      <p class="sub" id="mSub">Abonnix est un faux service de streaming, construit pour ce projet. Le chrono démarre au premier clic dans la fenêtre. Rien n'est envoyé : tout reste dans votre navigateur.</p>
+    </div>
+    <div class="meters" aria-live="polite">
+      <div><b id="mTime">0,0 s</b><span>temps</span></div>
+      <div><b id="mClicks">0</b><span>clics</span></div>
+      <button class="ghost" id="giveUp" type="button">J'abandonne</button>
+    </div>
+  </div>
+  <div class="browser" id="browser">
+    <div class="chrome"><i></i><i></i><i></i><span id="url">abonnix.example/accueil</span><em id="verTag">version actuelle</em></div>
+    <div class="screen" id="screen" aria-live="polite"></div>
+  </div>
+  <div class="replay" id="replay" hidden></div>
+</section>
+
+<!-- 2. AUDIT GRID -->
+<section id="p-grid" role="tabpanel" aria-labelledby="t-grid" class="panel grid" hidden>
+  <header class="ghead">
+    <div>
+      <h2>Grille d'audit des parcours de résiliation</h2>
+      <p class="sub">Un audit par service : chaque écran du parcours, l'action faite, les patterns observés (ontologie de Gray et al., CHI 2024) et les points du cadre légal. Les données restent dans ce navigateur ; exportez-les en CSV ou JSON.</p>
+    </div>
+    <div class="gtools">
+      <button class="ghost" id="gNew" type="button">+ Nouvel audit</button>
+      <button class="ghost" id="gCsv" type="button">Exporter CSV</button>
+      <button class="ghost" id="gJson" type="button">Exporter JSON</button>
+      <label class="ghost file">Importer JSON<input type="file" id="gImport" accept="application/json"></label>
+    </div>
+  </header>
+  <div class="gbody">
+    <aside class="glist" id="gList" aria-label="Audits"></aside>
+    <div class="gedit" id="gEdit"></div>
+  </div>
+  <section class="matrix" aria-labelledby="mxTitle">
+    <h3 id="mxTitle">Matrice de comparaison</h3>
+    <div class="mxwrap" id="matrix"></div>
+  </section>
+</section>
+
+<!-- 3. PROTOCOL & RESULTS -->
+<section id="p-res" role="tabpanel" aria-labelledby="t-res" class="panel res" hidden>
+  <div class="cols">
+    <article>
+      <h2>Question</h2>
+      <p>Un parcours de résiliation chargé de dark patterns empêche-t-il des personnes de résilier, et à quel coût en temps et en effort, comparé à un parcours conforme à la « résiliation en trois clics » ?</p>
+      <h2>Protocole</h2>
+      <ul>
+        <li><b>5 participant·es</b>, en présentiel, chacun·e fait les deux versions (intra-sujet). L'ordre alterne d'une personne à l'autre pour limiter l'effet d'apprentissage.</li>
+        <li><b>Consigne unique</b> : « Résiliez votre abonnement Abonnix. » Pas d'aide pendant la tâche, réflexion à voix haute.</li>
+        <li><b>Mesures</b> : réussite (résilié, mis en pause par erreur, abandon), temps, nombre de clics, pièges dans lesquels la personne tombe, facilité perçue (SEQ, échelle de 1 à 7).</li>
+        <li><b>Après les deux passages</b> : court entretien. « À quel moment avez-vous hésité ? Pensiez-vous avoir résilié ? »</li>
+        <li><b>Éthique</b> : service fictif, aucune donnée personnelle, consentement oral, possibilité d'arrêter à tout moment.</li>
+      </ul>
+      <h2>Cadre</h2>
+      <ul>
+        <li>Code de la consommation, art. L.215-1-1 et décret n° 2023-417 : depuis le 1er juin 2023, un contrat souscrit en ligne doit pouvoir être résilié en ligne, par une fonctionnalité gratuite, directement et facilement accessible.</li>
+        <li>Règlement (UE) 2022/2065 (DSA), art. 25, pour les services qui sont des plateformes en ligne.</li>
+        <li>Gray, Santos, Bielova, Mildner (CHI 2024), ontologie des dark patterns : noms et définitions des pièges.</li>
+      </ul>
+      <p class="note">Les observations sont présentées comme compatibles ou non avec ces textes, pas comme des conclusions juridiques.</p>
+    </article>
+    <article>
+      <h2>Résultats</h2>
+      <div class="pending" id="resPending">
+        <b>Tests en cours.</b> Les résultats des 5 participant·es seront publiés ici une fois les séances passées. Aucun chiffre n'est affiché avant.
+      </div>
+      <h3>Votre passage</h3>
+      <div id="mine" class="mine"><p class="sub">Faites la mission dans l'onglet « Essayez de résilier » pour voir vos chiffres ici.</p></div>
+      <div id="testTools" hidden>
+        <h3>Séances de test</h3>
+        <p class="sub">Mode test actif. Chaque passage est enregistré dans ce navigateur avec l'identifiant de la personne.</p>
+        <div class="row"><label>Participant·e <input id="pid" value="P1" size="5"></label><button class="ghost" id="sessCsv" type="button">Exporter les séances (CSV)</button><button class="ghost" id="sessClear" type="button">Vider</button></div>
+        <div class="mxwrap" id="sessions"></div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<script src="patterns.js"></script>
+<script src="flow.js"></script>
+<script src="grid.js"></script>
+<script>
+// Tabs
+const TABS=[["t-play","p-play"],["t-grid","p-grid"],["t-res","p-res"]];
+TABS.forEach(([t])=>document.getElementById(t).onclick=()=>showTab(t));
+function showTab(t){TABS.forEach(([u,p])=>{document.getElementById(u).setAttribute("aria-selected",String(u===t));document.getElementById(p).hidden=u!==t});if(t==="t-res")renderMine();if(t==="t-grid")Grid.render()}
+</script>
+</body>
+</html>

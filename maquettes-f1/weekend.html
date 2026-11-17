@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette 3 · Un week-end de course</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="common.css">
+<style>
+html{scroll-behavior:smooth}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+html,body{height:auto}body{background:var(--paper)}
+.mk-tag{top:auto;bottom:10px}
+.sched{position:sticky;top:0;z-index:20;background:rgba(246,244,239,.92);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:10px max(16px,4vw)}
+.sched ol{list-style:none;margin:0 auto;padding:0;display:flex;gap:4px;max-width:1100px;overflow-x:auto}
+.sched li{flex:1;min-width:92px}
+.sched a{display:block;text-decoration:none;color:var(--muted);font:600 12px/1.2 "JetBrains Mono",monospace;letter-spacing:.06em;padding:6px 8px;border-top:4px solid var(--line)}
+.sched a small{display:block;font:500 11px "Instrument Sans",system-ui,sans-serif;letter-spacing:0;margin-top:2px}
+.sched a.on{color:var(--ink);border-color:var(--acc)}.sched a.done{border-color:var(--ink)}
+section{padding:12vh max(16px,6vw);max-width:1240px;margin:0 auto;position:relative}
+.kick{font:700 13px "JetBrains Mono",monospace;letter-spacing:.14em;color:var(--acc);text-transform:uppercase}
+h2.disp{font-size:clamp(56px,10vw,140px);margin:.1em 0 .25em}
+.lead{font-size:clamp(17px,1.6vw,21px);max-width:58ch;color:#2a2f3a}
+/* hero */
+.hero{min-height:92vh;display:flex;flex-direction:column;justify-content:center;padding:6vh max(16px,6vw) 4vh;max-width:1240px;margin:0 auto}
+.hero h1{font-size:clamp(76px,16vw,230px);margin:0}
+.hero .meta{display:flex;flex-wrap:wrap;gap:10px 28px;margin-top:22px;font-weight:500}
+.hero .meta b{display:block;font:700 12px "JetBrains Mono",monospace;letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.track{position:relative;height:120px;margin-top:5vh;border-bottom:3px dashed #c9c3b6}
+.track svg{position:absolute;bottom:-6px;left:0;width:min(300px,50vw);transition:transform .08s linear}
+.scroll{margin-top:18px;color:var(--muted)}
+/* timing tower */
+.tower{list-style:none;padding:0;margin:28px 0 0;display:grid;gap:6px;max-width:900px}
+.tower button{width:100%;display:grid;grid-template-columns:52px 10px minmax(0,1fr) auto;gap:14px;align-items:center;text-align:left;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 16px;transition:transform .15s}
+.tower button:hover{transform:translateX(6px)}
+.tower .pos{font:900 30px "Big Shoulders Display","Arial Narrow",sans-serif}
+.tower .sw{height:34px;border-radius:3px}
+.tower .t{font-weight:600;font-size:17px}.tower .t small{display:block;font-weight:400;color:var(--muted);font-size:14px}
+.tower .gap{font:500 13px "JetBrains Mono",monospace;color:var(--muted);text-align:right}
+.tower .gap i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-left:3px;vertical-align:middle}
+/* quali cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:28px}
+.qcard{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.qcard.pole{background:var(--ink);color:#fff;border-color:var(--ink)}
+.qcard .p{font:900 54px/1 "Big Shoulders Display","Arial Narrow",sans-serif}
+.qcard .tag{font:700 12px "JetBrains Mono",monospace;letter-spacing:.1em;text-transform:uppercase}
+.qcard.pole .tag{color:#c4b0ff}
+.qcard h3{font-size:22px;margin:0}
+.qcard p{margin:0;color:inherit;opacity:.8}
+.qcard button{margin-top:auto;align-self:flex-start;border:0;border-radius:99px;padding:9px 14px;font-weight:600;background:var(--acc);color:#fff}
+/* lights out */
+.race{min-height:180vh}
+.race .stick{position:sticky;top:90px}
+.race h2.disp{font-size:clamp(40px,5.5vw,76px)}
+.lights{display:flex;gap:min(3vw,22px);margin:30px 0}
+.lights div{background:#14161c;border-radius:14px;padding:10px;display:grid;gap:10px}
+.lights i{display:block;width:min(8vw,48px);aspect-ratio:1;border-radius:50%;background:#2a2d35;transition:background .15s,box-shadow .15s}
+.lights i.on{background:#e63b2e;box-shadow:0 0 24px #e63b2e}
+.go{font-size:clamp(40px,6vw,84px);margin:0 0 16px;opacity:0;transition:opacity .3s}
+.go.show{opacity:1}
+.racecard{max-width:640px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px;opacity:0;transform:translateY(20px);transition:.4s}
+.racecard.show{opacity:1;transform:none}
+/* debrief */
+.trace{background:#14161c;border-radius:16px;padding:18px;margin-top:26px;overflow-x:auto}
+.trace svg{display:block;min-width:640px;width:100%}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:16px}
+.steps div{border-top:4px solid var(--c);padding-top:10px}
+.steps b{font:900 28px "Big Shoulders Display","Arial Narrow",sans-serif;text-transform:uppercase}
+/* parc ferme */
+.end{min-height:70vh}
+.end a.cv{display:inline-block;margin-top:20px;background:var(--ink);color:#fff;text-decoration:none;border-radius:99px;padding:14px 22px;font-weight:600}
+.flag{height:28px;margin-top:40px;background:repeating-conic-gradient(#14161c 0 25%,#fff 0 50%) 0 0/28px 28px;border-radius:4px}
+</style>
+</head>
+<body>
+<p class="mk-tag">Maquette 3/3 · Un week-end de course <a href="index.html">les 3 maquettes</a></p>
+<nav class="sched" aria-label="Programme du week-end"><ol>
+<li><a href="#fp" data-s="fp">VEN · EL<small>Essais libres</small></a></li>
+<li><a href="#q" data-s="q">SAM · Q<small>Qualifications</small></a></li>
+<li><a href="#race" data-s="race">DIM · GP<small>La course</small></a></li>
+<li><a href="#debrief" data-s="debrief">DÉBRIEF<small>Ma démarche</small></a></li>
+<li><a href="#parc" data-s="parc">PARC FERMÉ<small>CV et contact</small></a></li>
+</ol></nav>
+
+<header class="hero">
+  <p class="kick">Grand Prix de la Côte d'Azur · départ le 1er mars 2027</p>
+  <h1 class="disp">Amir<br>Benyahia</h1>
+  <div class="meta"><span><b>Discipline</b>UX research &amp; design</span><span><b>Durée</b>Stage M2 IHM de 6 mois</span><span><b>Circuit</b>Nice, Sophia Antipolis</span></div>
+  <div class="track" aria-hidden="true"><svg id="car" viewBox="0 0 300 70"><g>
+    <rect x="30" y="34" width="210" height="14" rx="4" fill="#14161c"/><path d="M60 34 Q90 14 150 16 L200 18 Q230 22 250 34 Z" fill="#f4f4f6" stroke="#14161c" stroke-width="2"/>
+    <path d="M118 18 q10 -14 30 -12" fill="none" stroke="#14161c" stroke-width="5" stroke-linecap="round"/><rect x="236" y="34" width="54" height="6" fill="#ff5a36"/><rect x="18" y="8" width="8" height="34" fill="#14161c"/><rect x="6" y="6" width="34" height="9" fill="#ff5a36"/>
+    <rect x="96" y="26" width="90" height="5" fill="#ff5a36"/>
+    <circle cx="68" cy="48" r="17" fill="#14161c"/><circle cx="68" cy="48" r="7" fill="#9aa3ad"/><circle cx="222" cy="49" r="15" fill="#14161c"/><circle cx="222" cy="49" r="6" fill="#9aa3ad"/></g></svg></div>
+  <p class="scroll">Faites défiler pour suivre le week-end ↓</p>
+</header>
+
+<section id="fp" data-s="fp">
+  <p class="kick">Vendredi · Essais libres</p>
+  <h2 class="disp">On explore</h2>
+  <p class="lead">Les projets où j'ai appris en essayant : le son, les données, l'IA. Cliquez sur une ligne pour voir la démo en direct.</p>
+  <ol class="tower" id="towerFP"></ol>
+</section>
+
+<section id="q" data-s="q">
+  <p class="kick">Samedi · Qualifications</p>
+  <h2 class="disp">Les tours qui comptent</h2>
+  <p class="lead">Mes trois projets les plus complets, de la recherche utilisateur au produit.</p>
+  <div class="grid" id="quali"></div>
+</section>
+
+<section id="race" class="race" data-s="race">
+  <div class="stick">
+    <p class="kick">Dimanche · La course</p>
+    <h2 class="disp" style="margin-bottom:0">Extinction des feux</h2>
+    <div class="lights" aria-hidden="true" id="lights"></div>
+    <p class="go disp" id="go">C'est parti</p>
+    <div class="racecard" id="raceCard"></div>
+  </div>
+</section>
+
+<section id="debrief" data-s="debrief">
+  <p class="kick">Débrief · Télémétrie</p>
+  <h2 class="disp">Ma démarche, tour par tour</h2>
+  <p class="lead">Comme un ingénieur relit la télémétrie après la course, je relis chaque projet avec les utilisateurs. Quatre secteurs, toujours dans cet ordre, et on recommence.</p>
+  <div class="trace"><svg viewBox="0 0 800 200" role="img" aria-label="Trace de vitesse sur un tour, découpée en 4 secteurs : comprendre, concevoir, tester, itérer">
+    <g font-family="JetBrains Mono" font-size="12" fill="#8a93a3"><text x="10" y="18">VITESSE</text><text x="740" y="192">TOUR</text></g>
+    <g stroke="#2e323c"><line x1="200" y1="10" x2="200" y2="180"/><line x1="400" y1="10" x2="400" y2="180"/><line x1="600" y1="10" x2="600" y2="180"/></g>
+    <path id="tr" d="M0 150 C 40 150 60 60 120 55 S 180 120 200 125 S 260 40 320 38 S 380 140 400 140 S 470 70 520 62 S 580 130 600 128 S 680 30 740 32 S 790 60 800 70" fill="none" stroke="#ff5a36" stroke-width="3.5"/>
+    <g font-family="JetBrains Mono" font-size="13" font-weight="700"><text x="20" y="190" fill="#8a5cf6">S1 COMPRENDRE</text><text x="215" y="190" fill="#18a058">S2 CONCEVOIR</text><text x="415" y="190" fill="#f5b800">S3 TESTER</text><text x="615" y="190" fill="#8cc4ff">S4 ITÉRER</text></g>
+  </svg></div>
+  <div class="steps">
+    <div style="--c:#8a5cf6"><b>Comprendre</b><p>Entretiens, observation, personas. CEIHM : un entretien avec une étudiante nous a donné nos personas.</p></div>
+    <div style="--c:#18a058"><b>Concevoir</b><p>Plusieurs options comparées avant de choisir : jauge ou min/max, carte ou « inspirez-moi ».</p></div>
+    <div style="--c:#f5b800"><b>Tester</b><p>Analyse heuristique, tests utilisateurs, mesures : je vérifie ce que je conçois.</p></div>
+    <div style="--c:#8cc4ff"><b>Itérer</b><p>On corrige à partir de ce qu'on a observé, puis on refait un tour.</p></div>
+  </div>
+</section>
+
+<section id="parc" class="end" data-s="parc">
+  <p class="kick">Parc fermé</p>
+  <h2 class="disp">Prêt pour le départ</h2>
+  <p class="lead">Je cherche un stage de 6 mois en UX research et design, à partir du 1er mars 2027, sur la Côte d'Azur.</p>
+  <a class="cv" href="../cv.pdf" target="_blank" rel="noopener">Télécharger mon CV (PDF)</a>
+  <div class="flag" aria-hidden="true"></div>
+</section>
+
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+const $=id=>document.getElementById(id),RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FP=["maze","sampler","spotify"],Q=["ceihm","room","flux"];
+const sec=c=>`<i style="background:${c}"></i>`;
+$("towerFP").innerHTML=FP.map((id,i)=>{const x=P[id];return`<li><button type="button" data-id="${id}"><span class="pos">P${i+4}</span><span class="sw" style="background:${x.col}"></span><span class="t">${x.t.fr}<small>${x.rh.fr}</small></span><span class="gap">${x.y}<br>${sec("#18a058")}${sec(i?"#f5b800":"#18a058")}${sec("#f5b800")}</span></button></li>`}).join("");
+const QT=["Pole position","2e sur la grille","3e sur la grille"];
+$("quali").innerHTML=Q.map((id,i)=>{const x=P[id];return`<article class="qcard${i?"":" pole"}"><span class="p">P${i+1}</span><span class="tag">${QT[i]} · ${x.y}</span><h3>${x.t.fr}</h3><p>${x.design.fr}</p><button type="button" data-id="${id}">Voir le projet</button></article>`}).join("");
+document.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>openProject(b.dataset.id));
+window.objLabel=id=>Q.includes(id)?"Qualifications · P"+(Q.indexOf(id)+1):FP.includes(id)?"Essais libres":"Course";
+$("lights").innerHTML=Array.from({length:5},()=>"<div><i></i><i></i></div>").join("");
+const f=P.f1;$("raceCard").innerHTML=`<p class="kick" style="margin:0">Le projet du dimanche</p><h3 class="disp" style="font-size:44px;margin:.2em 0">${f.t.fr}</h3><p>Mon projet F1 : une interface de stratégie en temps réel, construite sur de vraies données de course. En préparation.</p>`;
+// scroll-driven pieces
+const car=$("car"),race=$("race"),links=[...document.querySelectorAll(".sched a")],secs=[...document.querySelectorAll("section[data-s]")];
+function onScroll(){const y=scrollY,h=innerHeight;
+ if(!RM){const k=Math.min(1,y/(h*.8));car.style.transform=`translateX(${k*(innerWidth-Math.min(300,innerWidth*.5)-40)}px)`}
+ let cur=-1;secs.forEach((s,i)=>{if(s.getBoundingClientRect().top<h*.4)cur=i});links.forEach((a,i)=>{a.classList.toggle("on",i===cur);a.classList.toggle("done",i<cur);if(i===cur)a.setAttribute("aria-current","step");else a.removeAttribute("aria-current")});
+ const r=race.getBoundingClientRect(),p=Math.max(0,Math.min(1,(-r.top+h*.2)/(r.height-h)));const n=p<.75?Math.floor(p/.13):0;
+ document.querySelectorAll("#lights div").forEach((d,i)=>d.querySelectorAll("i").forEach(l=>l.classList.toggle("on",i<n)));
+ $("go").classList.toggle("show",p>=.75);$("raceCard").classList.toggle("show",p>=.8)}
+addEventListener("scroll",onScroll,{passive:true});addEventListener("resize",onScroll);onScroll();
+</script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette 1 · Tour de circuit</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="common.css">
+<style>
+body{overflow:hidden;background:#cfe5f2}
+canvas#c{position:fixed;inset:0;width:100%;height:100%;display:block;touch-action:none}
+.hud{position:fixed;z-index:10;pointer-events:none}
+.hud>*{pointer-events:auto}
+.brand{left:20px;top:18px}
+.brand h1{font-size:clamp(40px,7vw,92px);margin:0;color:var(--ink);transition:font-size .5s}
+.brand.small h1{font-size:34px}.brand.small p{display:none}
+canvas#c{transition:opacity .35s}
+.brand p{margin:.4em 0 0;max-width:34ch;color:#2a2f3a;font-weight:500}
+.timing{right:16px;top:16px;background:var(--ink);color:#fff;border-radius:12px;padding:10px 14px;min-width:200px;font-variant-numeric:tabular-nums}
+.timing .row{display:flex;justify-content:space-between;gap:16px;font-size:13px;color:#aeb4c0}
+.timing .t{font-size:30px;font-weight:600;color:#fff;letter-spacing:.02em}
+.timing .sec{display:flex;gap:4px;margin-top:6px}.timing .sec i{flex:1;height:5px;border-radius:2px;background:#3a3f4c}
+.timing .sec i.on{background:var(--yellow)}.timing .sec i.best{background:var(--purple)}.timing .sec i.ok{background:var(--green)}
+.speed{right:16px;top:132px;background:rgba(255,255,255,.85);border-radius:12px;padding:6px 12px;font-variant-numeric:tabular-nums;font-weight:600}
+.speed b{font-size:22px}
+.map{left:16px;bottom:16px;background:rgba(255,255,255,.88);border-radius:14px;padding:10px}
+.map svg{display:block;width:180px;height:140px}
+.map .lbl{font-size:12px;color:var(--muted);margin-bottom:4px}
+.card{left:50%;bottom:22px;transform:translateX(-50%);background:#fff;border-radius:16px;padding:14px 16px 14px 18px;display:flex;align-items:center;gap:16px;box-shadow:0 10px 30px rgba(20,22,28,.18);max-width:min(560px,calc(100vw - 32px));transition:opacity .2s,transform .2s}
+.card[hidden]{display:flex!important;opacity:0;transform:translate(-50%,10px);pointer-events:none}
+.card .num{font-size:40px;min-width:54px;text-align:center;color:#fff;border-radius:10px;padding:4px 6px}
+.card .k{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.card .ti{font-weight:600;font-size:17px}
+.card button{margin-left:auto;background:var(--acc);color:#fff;border:0;border-radius:99px;padding:10px 16px;font-weight:600;white-space:nowrap}
+.hint{left:50%;bottom:22px;transform:translateX(-50%);font-size:14px;color:#1f2430;background:rgba(255,255,255,.85);padding:8px 14px;border-radius:99px}
+.nav{right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+.nav .pair{display:flex;gap:6px}
+.nav button{background:#fff;border:1px solid var(--line);border-radius:99px;padding:9px 14px;font-weight:500}
+.nav button.dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.list{position:fixed;inset:0;z-index:40;background:rgba(246,244,239,.97);overflow:auto;padding:70px max(16px,6vw) 40px}
+.list h2{font-size:56px;margin:0 0 20px}
+.list ol{list-style:none;padding:0;margin:0;display:grid;gap:8px;max-width:720px}
+.list li button{width:100%;display:flex;gap:16px;align-items:center;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.list li .n{font-family:"Big Shoulders Display";font-weight:900;font-size:26px;width:46px}
+.list .x{position:fixed;right:16px;top:16px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:8px 14px}
+.start{position:fixed;inset:0;z-index:30;display:grid;place-items:end center;padding-bottom:12vh;background:linear-gradient(transparent 50%,rgba(20,22,28,.25))}
+.start button{background:var(--ink);color:#fff;border:0;border-radius:99px;padding:16px 26px;font-size:18px;font-weight:600}
+.start p{margin:10px 0 0;text-align:center;color:#fff;font-weight:500;text-shadow:0 1px 6px rgba(0,0,0,.4)}
+@media (max-width:700px){.brand h1{font-size:44px}.brand p{display:none}.map{display:none}.timing{min-width:0}.timing .t{font-size:22px}.speed{top:110px}.card{bottom:84px}.hint{bottom:84px}}
+</style>
+</head>
+<body>
+<p class="mk-tag">Maquette 1/3 · Tour de circuit <a href="index.html">les 3 maquettes</a></p>
+<canvas id="c" aria-label="Circuit en 3D : chaque virage est un projet"></canvas>
+
+<div class="hud brand"><h1 class="disp">Amir<br>Benyahia</h1><p>UX research &amp; design. Stage M2 IHM de 6 mois dès le 1er mars 2027, Côte d'Azur.</p></div>
+<div class="hud timing" aria-live="off"><div class="row"><span id="lapN">Tour 1</span><span>Circuit de la Baie</span></div><div class="t" id="lapT">0:00.000</div><div class="row"><span>Meilleur</span><span id="best">--:--.---</span></div><div class="sec"><i id="s1"></i><i id="s2"></i><i id="s3"></i></div></div>
+<div class="hud speed"><b id="kmh">0</b> km/h</div>
+<div class="hud map"><div class="lbl">Circuit de la Baie · 7 virages</div><svg id="map" viewBox="0 0 180 140" role="img" aria-label="Plan du circuit"></svg></div>
+<div class="hud card" id="card" hidden><div class="num disp" id="cNum">V1</div><div><div class="k" id="cK">Virage 1</div><div class="ti" id="cT"></div></div><button type="button" id="cOpen">Ouvrir le projet</button></div>
+<div class="hud hint" id="hint">Défilez ou ↑ pour rouler · ← → pour passer d'un virage à l'autre</div>
+<div class="hud nav"><div class="pair"><button type="button" id="prev" aria-label="Virage précédent">◀</button><button type="button" id="next" aria-label="Virage suivant">▶</button></div><button type="button" class="dark" id="all">Tous les projets</button></div>
+
+<div class="list" id="list" hidden><button class="x" type="button" id="listX">Fermer</button><h2 class="disp">Les 7 virages</h2><ol id="listOl"></ol></div>
+<div class="start" id="start"><div><button type="button" id="go">Démarrer le tour</button><p>ou « Tous les projets » pour aller droit au but</p></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+const RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const $=id=>document.getElementById(id);
+const cv=$("c"),R=new THREE.WebGLRenderer({canvas:cv,antialias:true});R.setPixelRatio(Math.min(devicePixelRatio,2));R.shadowMap.enabled=true;R.shadowMap.type=THREE.PCFSoftShadowMap;
+const scene=new THREE.Scene();scene.background=new THREE.Color(0xcfe5f2);scene.fog=new THREE.Fog(0xcfe5f2,220,700);
+const cam=new THREE.PerspectiveCamera(55,1,.5,800);
+scene.add(new THREE.HemisphereLight(0xffffff,0xb9a98a,.55));
+const sun=new THREE.DirectionalLight(0xfff1dc,.85);sun.position.set(-80,120,-60);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-160,right:160,top:160,bottom:-160,far:400});scene.add(sun);scene.add(sun.target);
+const M=(c,o={})=>new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.9,metalness:0},o));
+function box(w,h,d,c,x,y,z,p){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),M(c));m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;(p||scene).add(m);return m}
+function cyl(rt,rb,h,c,x,y,z,p,s=16){const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,s),M(c));m.position.set(x,y,z);m.castShadow=m.receiveShadow=true;(p||scene).add(m);return m}
+
+// ground, beach, sea, hills
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(900,900),M(0xd9cfb6));ground.rotation.x=-Math.PI/2;ground.position.set(60,-.02,180);ground.receiveShadow=true;scene.add(ground);
+const sea=new THREE.Mesh(new THREE.PlaneGeometry(1400,700),M(0x2f7fbf,{roughness:1}));sea.rotation.x=-Math.PI/2;sea.position.set(60,-.05,-370);scene.add(sea);
+const beach=new THREE.Mesh(new THREE.PlaneGeometry(1400,18),M(0xe9d6a8));beach.rotation.x=-Math.PI/2;beach.position.set(60,-.01,-24);beach.receiveShadow=true;scene.add(beach);
+[[-160,260,90,70],[-40,330,120,90],[120,320,100,80],[260,280,110,85],[360,200,80,60]].forEach(([x,z,r,h])=>{const m=new THREE.Mesh(new THREE.ConeGeometry(r,h,7),M(0xb9c4b0,{flatShading:true}));m.position.set(x,h/2-2,z);scene.add(m)});
+
+// track: imaginary street circuit along the bay
+const pts=[[0,0],[80,0],[150,4],[188,30],[192,72],[162,98],[122,92],[96,118],[102,152],[72,178],[20,172],[-22,142],[-38,100],[-64,70],[-58,30],[-32,8]].map(([x,z])=>new THREE.Vector3(x,0,z));
+const curve=new THREE.CatmullRomCurve3(pts,true,"centripetal");const LEN=curve.getLength();
+const N=900,W=9,S=[];for(let i=0;i<=N;i++){const u=i/N,p=curve.getPointAt(u%1),t=curve.getTangentAt(u%1);S.push({p,t,n:new THREE.Vector3(-t.z,0,t.x)})}
+function ribbon(off0,off1,y,color){const g=new THREE.BufferGeometry(),v=[],idx=[];S.forEach(({p,n})=>{v.push(p.x+n.x*off0,y,p.z+n.z*off0,p.x+n.x*off1,y,p.z+n.z*off1)});for(let i=0;i<N;i++){const a=i*2;idx.push(a,a+1,a+2,a+1,a+3,a+2)}g.setAttribute("position",new THREE.Float32BufferAttribute(v,3));g.setIndex(idx);g.computeVertexNormals();const m=new THREE.Mesh(g,M(color,{side:THREE.DoubleSide}));m.receiveShadow=true;scene.add(m);return m}
+ribbon(-W/2-3,W/2+3,.01,0xd8d3c6);ribbon(-W/2,W/2,.03,0x41464f);ribbon(-W/2+.3,-W/2+.6,.05,0xffffff);ribbon(W/2-.6,W/2-.3,.05,0xffffff);
+// kerbs where the track bends
+for(let i=0;i<N;i+=3){const a=S[i].t,b=S[(i+12)%N].t,turn=a.x*b.z-a.z*b.x;if(Math.abs(turn)<.09)continue;const side=turn>0?1:-1;const {p,n,t}=S[i];const k=box(1.6,.12,2.2,(i/3)%2?0xffffff:0xe63b2e,p.x+n.x*side*(W/2+.8),.06,p.z+n.z*side*(W/2+.8));k.rotation.y=Math.atan2(t.x,t.z)}
+// start/finish line + pit building
+{const {p,t}=S[0];const l=box(W,.06,1.2,0xffffff,p.x,.05,p.z);l.rotation.y=Math.atan2(t.x,t.z);for(let i=0;i<8;i++){const q=box(W/8,.07,.6,0x14161c,p.x-W/2+W/16+i*W/8,.06,p.z+(i%2?.3:-.3));q.rotation.y=l.rotation.y}}
+box(60,7,10,0xf7f4ef,40,3.5,22);box(60,.6,12,0x14161c,40,7.3,22);for(let i=0;i<8;i++)box(5.5,4.2,.3,0x9fb8cc,15+i*7,2.4,16.9);
+// palms on the promenade
+function palm(x,z){const h=7+Math.random()*3;const tr=cyl(.25,.4,h,0x9b7b55,x,h/2,z);for(let k=0;k<7;k++){const f=new THREE.Mesh(new THREE.ConeGeometry(.5,4.2,4),M(0x5f9a62,{flatShading:true}));f.position.set(x,h,z);f.rotation.z=1.1;f.rotation.y=k/7*Math.PI*2;f.geometry.translate(0,2.1,0);f.castShadow=true;scene.add(f)}}
+for(let x=-60;x<220;x+=16)palm(x+Math.random()*4,-11);
+// Riviera buildings, kept off the track
+const pal=[0xf0c58a,0xeaa58d,0xf3e3c3,0xe8b86b,0xf2d0b8,0xdcc9a6];const free=(x,z,r)=>S.every(s=>Math.hypot(s.p.x-x,s.p.z-z)>r+W);
+let tries=0,placed=0;while(placed<90&&tries<3000){tries++;const x=-120+Math.random()*360,z=30+Math.random()*220,w=8+Math.random()*10,d=8+Math.random()*10,h=6+Math.random()*16;if(!free(x,z,Math.max(w,d)*.75)||(x>5&&x<75&&z<32))continue;placed++;box(w,h,d,pal[placed%pal.length],x,h/2,z);box(w+.6,.8,d+.6,0xc8714f,x,h+.4,z);for(let k=1;k<h/3.5;k++)box(w+.05,.5,.2,0xffffff,x,k*3.2,z+d/2)}
+
+// project gantries
+window.objLabel=id=>"Virage "+(ORDERC.indexOf(id)+1)+" · "+CN[ORDERC.indexOf(id)];
+const ORDERC=["ceihm","spotify","room","flux","sampler","maze","f1"],CN=["Promenade","Château","Port","Corniche","Cap","Tunnel","Baie"];
+const GU=[.07,.19,.31,.44,.57,.7,.83];
+function label(n,title,col){const c=document.createElement("canvas");c.width=1024;c.height=320;const x=c.getContext("2d");x.fillStyle=col;x.fillRect(0,0,1024,320);x.fillStyle="#14161c";x.fillRect(0,0,260,320);x.fillStyle="#fff";x.font="900 170px 'Big Shoulders Display', Arial Narrow, sans-serif";x.textAlign="center";x.fillText("V"+n,130,225);x.fillStyle="#14161c";x.textAlign="left";x.font="600 64px 'Instrument Sans', system-ui";
+ const words=title.split(" ");let line="",y=130;words.forEach(w=>{const t=line?line+" "+w:w;if(x.measureText(t).width>720){x.fillText(line,290,y);line=w;y+=76}else line=t});x.fillText(line,290,y);return new THREE.CanvasTexture(c)}
+const gates=[];
+function buildGates(){ORDERC.forEach((id,i)=>{const u=GU[i],{p,t,n}=S[Math.round(u*N)],g=new THREE.Group();g.position.copy(p);g.rotation.y=Math.atan2(t.x,t.z);scene.add(g);
+ const col=P[id].col;[-1,1].forEach(s=>box(.5,9,.5,0x14161c,s*(W/2+1.5),4.5,0,g));box(W+4,.6,.6,0x14161c,0,8.8,0,g);
+ const mat=new THREE.MeshBasicMaterial({map:label(i+1,P[id].t.fr,col)});const b=new THREE.Mesh(new THREE.PlaneGeometry(W+3,(W+3)*320/1024),mat);b.position.set(0,7.2,-.35);b.rotation.y=Math.PI;g.add(b);b.userData.id=id;
+ const b2=b.clone();b2.position.z=.35;b2.rotation.y=0;g.add(b2);gates.push({id,u,mesh:[b,b2],i})})}
+document.fonts&&document.fonts.ready.then(buildGates).catch(buildGates);if(!document.fonts)buildGates();
+
+// the car (generic open-wheeler in Amir's colours)
+const car=new THREE.Group();scene.add(car);
+{const Wc=0xf7f7f8,D=0x14161c,C=0xff5a36,G=0x9aa3ad,s=car;
+ box(1.1,.16,4.4,D,0,.3,0,s);box(1.1,.62,2.4,Wc,0,.68,.1,s);box(.46,.3,1.7,Wc,0,.5,2.0,s);box(.3,.22,.6,Wc,0,.42,3.0,s);box(2.4,.06,.55,C,0,.18,3.35,s);
+ [-.85,.85].forEach(x=>{box(.6,.5,2.0,Wc,x,.54,-.3,s);box(.62,.08,2.02,C,x,.82,-.3,s)});box(.62,.72,1.5,Wc,0,.84,-1.45,s);box(.34,.42,.5,D,0,1.3,-.55,s);
+ box(.7,.16,.9,D,0,.98,.75,s);box(.07,.07,1.0,D,0,1.24,.72,s);box(1.7,.09,.5,C,0,1.38,-2.25,s);[-.85,.85].forEach(x=>box(.06,.72,.66,D,x,1.08,-2.25,s));
+ car.userData.wheels=[];[[1.15,1.75],[-1.15,1.75],[1.15,-1.75],[-1.15,-1.75]].forEach(([x,z])=>{const r=z<0?.46:.42,w=cyl(r,r,.5,D,x,r,z,s,20);w.rotation.z=Math.PI/2;cyl(r+.01,r+.01,.06,0xf5b800,x>0?x+.22:x-.22,r,z,s).rotation.z=Math.PI/2});car.scale.setScalar(1.15)}
+
+// minimap
+{const xs=S.map(s=>s.p.x),zs=S.map(s=>s.p.z),mx=Math.min(...xs),Mx=Math.max(...xs),mz=Math.min(...zs),Mz=Math.max(...zs),sc=Math.min(160/(Mx-mx),120/(Mz-mz));
+ window.mapXY=p=>[10+(p.x-mx)*sc,130-(p.z-mz)*sc];
+ const d=S.map((s,i)=>(i?"L":"M")+mapXY(s.p).map(v=>v.toFixed(1)).join(" ")).join(" ")+"Z";
+ $("map").innerHTML=`<path d="${d}" fill="none" stroke="#14161c" stroke-width="5" stroke-linejoin="round"/><path d="${d}" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="3 3"/>`+GU.map((u,i)=>{const [x,y]=mapXY(S[Math.round(u*N)].p);return`<g class="gd" data-i="${i}" style="cursor:pointer"><circle cx="${x}" cy="${y}" r="7" fill="${P[ORDERC[i]].col}" stroke="#14161c"/><text x="${x}" y="${y+3.5}" font-size="9" text-anchor="middle" font-weight="700">${i+1}</text></g>`}).join("")+`<circle id="dot" r="5" fill="#ff5a36" stroke="#fff" stroke-width="2"/>`;
+ $("map").querySelectorAll(".gd").forEach(g=>g.onclick=()=>goTo(+g.dataset.i))}
+
+// driving model
+let u=0,v=0,target=null,started=false,lapStart=0,lap=1,best=null,secT=[0,0,0],near=-1,last=0;
+function wrap(x){return(x%1+1)%1}
+function goTo(i){begin();const tu=GU[i];if(RM){u=tu-.004;v=0;target=null;return}let d=wrap(tu-u);if(d>.5)d-=1;if(Math.abs(d)>.22){cv.style.opacity=0;setTimeout(()=>{u=wrap(tu-.05);v=40;target=tu-.004;cv.style.opacity=1},360);return}target=tu-.004}
+function begin(){if(!started){started=true;lapStart=performance.now()}$("start").hidden=true;document.querySelector(".brand").classList.add("small")}
+addEventListener("wheel",e=>{if(!started)return;target=null;v=Math.max(-20,Math.min(85,v+e.deltaY*.06))},{passive:true});
+let ty=null;addEventListener("touchstart",e=>ty=e.touches[0].clientY,{passive:true});addEventListener("touchmove",e=>{if(!started||ty==null)return;const y=e.touches[0].clientY;target=null;v=Math.max(-20,Math.min(85,v+(ty-y)*.25));ty=y},{passive:true});
+const keys={};addEventListener("keydown",e=>{if(!$("sheet")||$("sheet").hidden){if(e.key==="ArrowRight"){e.preventDefault();goTo(((near>=0?near:nextGate())+1)%7)}if(e.key==="ArrowLeft"){e.preventDefault();goTo(((near>=0?near:nextGate())+6)%7)}if(e.key==="Enter"&&near>=0&&document.activeElement===document.body)openProject(ORDERC[near])}keys[e.key]=true});addEventListener("keyup",e=>keys[e.key]=false);
+function nextGate(){for(let i=0;i<7;i++)if(GU[i]>u)return i-1<0?6:i-1;return 6}
+$("go").onclick=()=>{begin();v=30};
+$("next").onclick=()=>goTo(((near>=0?near:nextGate())+1)%7);$("prev").onclick=()=>goTo(((near>=0?near:nextGate())+6)%7);
+$("cOpen").onclick=()=>near>=0&&openProject(ORDERC[near]);
+$("all").onclick=()=>{$("list").hidden=false;$("listX").focus()};$("listX").onclick=()=>$("list").hidden=true;
+$("listOl").innerHTML=ORDERC.map((id,i)=>`<li><button type="button" data-id="${id}"><span class="n">V${i+1}</span><span><b>${P[id].t.fr}</b><br><small style="color:var(--muted)">Virage ${CN[i]} · ${P[id].y} · ${P[id].tags.join(", ")}</small></span></button></li>`).join("");
+$("listOl").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("list").hidden=true;openProject(b.dataset.id)});
+// click a board in 3D
+const ray=new THREE.Raycaster(),ndc=new THREE.Vector2();cv.addEventListener("click",e=>{ndc.set(e.clientX/innerWidth*2-1,-e.clientY/innerHeight*2+1);ray.setFromCamera(ndc,cam);const h=ray.intersectObjects(gates.flatMap(g=>g.mesh))[0];if(h)openProject(h.object.userData.id)});
+window.onProjectOpen=()=>{v=0;target=null};
+
+function fmt(ms){const s=ms/1000,m=Math.floor(s/60);return m+":"+(s%60).toFixed(3).padStart(6,"0")}
+function size(){R.setSize(innerWidth,innerHeight,false);cam.aspect=innerWidth/innerHeight;cam.fov=innerWidth<700?68:55;cam.updateProjectionMatrix()}addEventListener("resize",size);size();
+const camPos=new THREE.Vector3(-14,7,-4),look=new THREE.Vector3();
+function loop(t){const dt=Math.min(.05,(t-(last||t))/1000);last=t;
+ if(started){if(keys.ArrowUp||keys.w||keys.z){target=null;v=Math.min(85,v+60*dt)}if(keys.ArrowDown||keys.s){target=null;v=Math.max(-10,v-80*dt)}
+  if(target!=null){let d=wrap(target-u);if(d>.5)d-=1;const dist=d*LEN;v=Math.max(-60,Math.min(85,dist*1.6));if(Math.abs(dist)<.6){u=wrap(target);v=0;target=null}}
+  else v*=Math.pow(.55,dt);
+  const pu=u;u=wrap(u+v*dt/LEN);if(pu>.9&&u<.1){const ms=t-lapStart;if(ms>4000){best=best==null?ms:Math.min(best,ms);$("best").textContent=fmt(best);lap++;$("lapN").textContent="Tour "+lap}lapStart=t}
+  $("lapT").textContent=fmt(t-lapStart);["s1","s2","s3"].forEach((s,i)=>$(s).className=u>=i/3&&u<(i+1)/3?"on":u>(i+1)/3?"ok":"");$("kmh").textContent=Math.round(Math.abs(v)*3.6)}
+ const p=curve.getPointAt(u),tg=curve.getTangentAt(u);car.position.copy(p);car.rotation.y=Math.atan2(tg.x,tg.z);
+ const want=curve.getPointAt(wrap(u-14/LEN)).add(new THREE.Vector3(0,7,0));if(!started){const a=t*.00012;want.set(p.x+Math.cos(a)*30,16,p.z+Math.sin(a)*30)}
+ camPos.lerp(want,started?1-Math.pow(.02,dt):1-Math.pow(.2,dt));cam.position.copy(camPos);look.copy(p).addScaledVector(tg,started?12:0).add(new THREE.Vector3(0,1.5,0));cam.lookAt(look);
+ sun.position.set(p.x-80,120,p.z-60);sun.target.position.copy(p);
+ const [mx,my]=mapXY(p);const dot=$("dot");dot&&(dot.setAttribute("cx",mx),dot.setAttribute("cy",my));
+ let nn=-1;GU.forEach((g,i)=>{let d=wrap(g-u);if(d>.5)d-=1;if(d>-.012&&d<.03)nn=i});
+ if(nn!==near){near=nn;if(near>=0){const id=ORDERC[near];$("cNum").textContent="V"+(near+1);$("cNum").style.background=P[id].col;$("cK").textContent="Virage "+(near+1)+" · "+CN[near];$("cT").textContent=P[id].t.fr;$("card").hidden=false;$("hint").hidden=true}else{$("card").hidden=true;$("hint").hidden=!started&&false}}
+ R.render(scene,cam);requestAnimationFrame(loop)}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>

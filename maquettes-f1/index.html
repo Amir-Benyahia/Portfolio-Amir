@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portfolio F1 · 3 maquettes</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="common.css">
+<style>
+html,body{height:auto}
+main{max-width:1180px;margin:0 auto;padding:48px max(16px,4vw) 64px}
+h1{font-size:clamp(48px,8vw,104px);margin:0}
+.lead{max-width:60ch;font-size:18px;color:#2a2f3a}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px;margin-top:32px}
+a.card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;text-decoration:none;color:inherit;transition:transform .15s,box-shadow .15s}
+a.card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(20,22,28,.12)}
+a.card img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover;background:#ddd}
+a.card div{padding:16px 18px 20px}
+a.card .n{font:900 40px/1 "Big Shoulders Display","Arial Narrow",sans-serif;color:var(--acc)}
+a.card h2{margin:6px 0 6px;font-size:22px}
+a.card p{margin:0;color:var(--muted)}
+.note{margin-top:28px;font-size:14px;color:var(--muted);max-width:70ch}
+</style>
+</head>
+<body>
+<main>
+  <h1 class="disp">Portfolio F1 · 3 maquettes</h1>
+  <p class="lead">Trois façons de rendre le portfolio immersif. Chaque maquette contient tes vrais projets et ouvre les vraies démos. Essaie-les, puis dis-moi laquelle on développe.</p>
+  <div class="cards">
+    <a class="card" href="circuit.html"><img src="thumbs/circuit.jpg" alt="Aperçu : une monoplace sur un circuit en bord de mer, un portique affiche un projet"><div><span class="n">1</span><h2>Tour de circuit</h2><p>Un circuit imaginaire sur la Côte d'Azur. On roule (défilement ou flèches), chaque virage est un projet.</p></div></a>
+    <a class="card" href="cockpit.html"><img src="thumbs/cockpit.jpg" alt="Aperçu : vue depuis le baquet, un volant de F1 avec des boutons de couleur et un écran"><div><span class="n">2</span><h2>Dans le cockpit</h2><p>Vue depuis le baquet. Les boutons du volant ouvrent les projets, la radio d'équipe commente.</p></div></a>
+    <a class="card" href="weekend.html"><img src="thumbs/weekend.jpg" alt="Aperçu : grande typographie, cartes de qualifications P1, P2, P3"><div><span class="n">3</span><h2>Un week-end de course</h2><p>Un récit au défilement : essais, qualifs, course, débrief. Les feux s'éteignent quand on arrive au projet F1.</p></div></a>
+  </div>
+  <p class="note">Maquettes de direction : rien n'est final (sons, version anglaise, test participant et version texte viendront dans la version retenue). Monoplace et couleurs génériques, sans logo ni livrée officielle.</p>
+</main>
+</body>
+</html>

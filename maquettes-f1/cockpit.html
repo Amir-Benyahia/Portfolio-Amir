@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maquette 2 · Dans le cockpit</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<link rel="stylesheet" href="common.css">
+<style>
+body{overflow:hidden;background:#bcdcf0}
+#road{position:fixed;inset:0;width:100%;height:100%;display:block}
+.cockpit{position:fixed;inset:0;pointer-events:none}
+.cockpit svg{position:absolute;inset:0;width:100%;height:100%}
+.top{position:fixed;left:18px;top:16px;right:18px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;z-index:5}
+.who{color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.35)}
+.who b{font-size:30px;display:block}
+.who span{font-weight:500}
+.tools{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.tools button{background:rgba(255,255,255,.92);border:0;border-radius:99px;padding:9px 14px;font-weight:500}
+.radio{position:fixed;left:50%;top:76px;transform:translateX(-50%);z-index:5;background:rgba(20,22,28,.88);color:#fff;border-radius:14px;padding:10px 16px;max-width:min(560px,calc(100vw - 32px));display:flex;gap:12px;align-items:center}
+.radio .lab{font:700 11px/1 "JetBrains Mono",monospace;letter-spacing:.12em;color:#ffb39e;border:1px solid #ffb39e;border-radius:4px;padding:4px 5px;white-space:nowrap}
+.radio .wave{display:flex;gap:2px;align-items:center;height:18px}.radio .wave i{width:3px;background:#ffb39e;border-radius:2px;height:4px;animation:w 1s infinite ease-in-out}
+.radio .wave i:nth-child(2){animation-delay:.15s}.radio .wave i:nth-child(3){animation-delay:.3s}.radio .wave i:nth-child(4){animation-delay:.45s}
+@keyframes w{50%{height:16px}}
+@media (prefers-reduced-motion:reduce){.radio .wave i{animation:none;height:8px}}
+.wheel{position:fixed;left:50%;bottom:-2%;transform:translateX(-50%);width:min(940px,100vw);aspect-ratio:800/430;z-index:6}
+.wheel svg{position:absolute;inset:0;width:100%;height:100%}
+.wheel .b{position:absolute;transform:translate(-50%,-50%);width:6.2%;aspect-ratio:1;border-radius:50%;border:3px solid #0d0f13;font:700 clamp(9px,1.2vw,13px)/1 "JetBrains Mono",monospace;color:#14161c;box-shadow:inset 0 -4px 0 rgba(0,0,0,.25),0 2px 0 #000;display:grid;place-items:center;padding:0}
+.wheel .b[aria-pressed="true"]{outline:3px solid #fff;outline-offset:2px}
+.wheel .b.pit{width:9%;color:#fff}
+.wheel .dial{position:absolute;transform:translate(-50%,-50%);width:8%;aspect-ratio:1;border-radius:50%;background:radial-gradient(circle at 50% 40%,#4a4f5c,#22252d);border:3px solid #0d0f13;color:#fff;font:700 clamp(8px,1vw,11px)/1 "JetBrains Mono",monospace;padding:0}
+.wheel .dial span{position:absolute;left:50%;top:116%;transform:translateX(-50%);white-space:nowrap;color:#c9ced8}
+.wheel .dial::after{content:"";position:absolute;left:50%;top:8%;width:3px;height:30%;background:#ff5a36;transform-origin:50% 140%;transform:translateX(-50%) rotate(var(--r,0deg));border-radius:2px}
+.lcd{position:absolute;left:33.75%;top:19%;width:32.5%;height:38%;background:#0b0d11;border-radius:10px;color:#e8ecf3;padding:2.2% 2.6%;display:flex;flex-direction:column;overflow:hidden;font-family:"JetBrains Mono",monospace}
+.lcd .r1{display:flex;justify-content:space-between;font-size:clamp(8px,1vw,11px);color:#8a93a3}
+.lcd .ti{font:900 clamp(16px,2.6vw,30px)/1 "Big Shoulders Display",sans-serif;text-transform:uppercase;margin:5% 0 3%}
+.lcd .tx{font-size:clamp(8px,1vw,11.5px);line-height:1.4;color:#c9ced8;flex:1;overflow:hidden}
+.lcd .ok{align-self:flex-start;background:#18a058;color:#fff;border:0;border-radius:6px;font:700 clamp(9px,1.05vw,12px)/1 "JetBrains Mono",monospace;padding:6px 10px;margin-top:4px}
+.lcd .bar{height:4px;border-radius:2px;margin-top:4px}
+.list{position:fixed;inset:0;z-index:40;background:rgba(246,244,239,.97);overflow:auto;padding:70px max(16px,6vw) 40px}
+.list h2{font-size:56px;margin:0 0 20px}.list ol{list-style:none;padding:0;margin:0;display:grid;gap:8px;max-width:720px}
+.list li button{width:100%;display:flex;gap:16px;align-items:center;text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.list .x{position:fixed;right:16px;top:16px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:8px 14px}
+.keys{position:fixed;right:16px;bottom:16px;z-index:5;color:#fff;font-size:13px;text-shadow:0 1px 6px rgba(0,0,0,.5);text-align:right}
+@media (max-width:700px){.who b{font-size:22px}.who span{display:none}.radio{top:112px;left:12px;right:12px;transform:none;max-width:none;font-size:13px;padding:8px 12px}.radio .wave{display:none}.mk-tag{top:auto;bottom:8px}.wheel{bottom:0;width:150vw}.keys{display:none}}
+</style>
+</head>
+<body>
+<p class="mk-tag">Maquette 2/3 · Dans le cockpit <a href="index.html">les 3 maquettes</a></p>
+<canvas id="road" aria-hidden="true"></canvas>
+<div class="cockpit" aria-hidden="true"><svg viewBox="0 0 1000 600" preserveAspectRatio="xMidYMax slice">
+  <!-- halo -->
+  <path d="M190 -10 C 300 120, 700 120, 810 -10" fill="none" stroke="#14161c" stroke-width="34" stroke-linecap="round"/>
+  <path d="M500 88 L500 230" stroke="#14161c" stroke-width="22" stroke-linecap="round"/>
+  <!-- mirrors -->
+  <g><rect x="40" y="250" width="150" height="70" rx="22" fill="#14161c"/><rect x="52" y="261" width="126" height="48" rx="14" fill="#a9d1ea"/><rect x="52" y="292" width="126" height="17" rx="0" fill="#575d68"/></g>
+  <g><rect x="810" y="250" width="150" height="70" rx="22" fill="#14161c"/><rect x="822" y="261" width="126" height="48" rx="14" fill="#a9d1ea"/><rect x="822" y="292" width="126" height="17" fill="#575d68"/></g>
+  <!-- chassis sides -->
+  <path d="M-20 600 L-20 420 C 120 400, 200 430, 250 600 Z" fill="#f4f4f6"/><path d="M-20 446 C 110 430, 190 450, 232 560" fill="none" stroke="#ff5a36" stroke-width="14"/>
+  <path d="M1020 600 L1020 420 C 880 400, 800 430, 750 600 Z" fill="#f4f4f6"/><path d="M1020 446 C 890 430, 810 450, 768 560" fill="none" stroke="#ff5a36" stroke-width="14"/>
+</svg></div>
+
+<div class="top"><div class="who"><b class="disp">Amir Benyahia</b><span>UX research &amp; design · stage M2 IHM dès mars 2027 · Côte d'Azur</span></div>
+<div class="tools"><button type="button" id="all">Tous les projets</button></div></div>
+<div class="radio" role="status" aria-live="polite"><span class="lab">RADIO</span><span class="wave" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="radio">Salut, c'est Amir. Chaque bouton du volant ouvre un projet. Commence par celui que tu veux.</span></div>
+
+<div class="wheel" id="wheel">
+  <svg viewBox="0 0 800 430" aria-hidden="true">
+    <defs><pattern id="grip" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#2b2e36"/><circle cx="4" cy="4" r="1.3" fill="#363a44"/></pattern></defs>
+    <rect x="60" y="95" width="140" height="320" rx="60" fill="url(#grip)"/><rect x="600" y="95" width="140" height="320" rx="60" fill="url(#grip)"/>
+    <path d="M150 70 Q150 40 190 40 L610 40 Q650 40 650 70 L668 360 Q670 410 620 410 L180 410 Q130 410 132 360 Z" fill="#1c1e24"/>
+    <path d="M150 70 Q150 40 190 40 L610 40 Q650 40 650 70" fill="none" stroke="#30333c" stroke-width="3"/>
+    <g id="leds"></g>
+    <rect x="262" y="76" width="276" height="174" rx="14" fill="#30333c"/>
+    <text x="400" y="396" text-anchor="middle" fill="#5d6370" font-family="JetBrains Mono" font-size="11" letter-spacing="3">AB · UX</text>
+  </svg>
+  <div class="lcd" id="lcd"></div>
+</div>
+<p class="keys">Touches 1 à 7 · Entrée pour ouvrir · P pour le profil</p>
+<div class="list" id="list" hidden><button class="x" type="button" id="listX">Fermer</button><h2 class="disp">Les projets</h2><ol id="listOl"></ol></div>
+
+<script src="data.js"></script>
+<script src="common.js"></script>
+<script>
+const $=id=>document.getElementById(id),RM=matchMedia("(prefers-reduced-motion: reduce)").matches;
+const ORD=["ceihm","spotify","room","flux","sampler","maze","f1"],CODE=["CEI","VIZ","AR","STK","AUD","IA","PIT"];
+const POS=[[26.9,25],[26.9,40],[26.9,55],[73.1,25],[73.1,40],[73.1,55],[50,77]];
+const PROFS=[["rh","RH"],["design","DES"],["dev","DEV"]];let prof=1,sel=-1,speed=.6;
+window.objLabel=id=>"Bouton "+CODE[ORD.indexOf(id)];
+// shift lights
+$("leds").innerHTML=Array.from({length:15},(_,i)=>`<circle cx="${288+i*16.6}" cy="58" r="6" fill="#2a2d35" data-i="${i}"/>`).join("");
+function leds(n){document.querySelectorAll("#leds circle").forEach((c,i)=>c.setAttribute("fill",i<n?(i<5?"#18a058":i<10?"#e63b2e":"#3b82f6"):"#2a2d35"))}
+// buttons
+const W=$("wheel");ORD.forEach((id,i)=>{const b=document.createElement("button");b.type="button";b.className="b"+(id==="f1"?" pit":"");b.style.left=POS[i][0]+"%";b.style.top=POS[i][1]+"%";b.style.background=P[id].col;b.textContent=CODE[i];b.setAttribute("aria-pressed","false");b.setAttribute("aria-label",`Projet ${i+1} : ${P[id].t.fr}`);b.onclick=()=>{if(sel===i)openProject(id);else select(i)};W.appendChild(b)});
+function dial(x,label,get,onTurn,name){const d=document.createElement("button");d.type="button";d.className="dial";d.style.left=x+"%";d.style.top="80%";d.innerHTML=`<span>${label}</span>`;d.onclick=()=>{onTurn();upd()};const upd=()=>{d.style.setProperty("--r",get()[0]);d.setAttribute("aria-label",name+" : "+get()[1]);d.firstChild.textContent=label+" · "+get()[2]};upd();W.appendChild(d);return upd}
+const updProf=dial(33.5,"PROFIL",()=>[(prof-1)*60+"deg",["Recrutement","Design","Développement"][prof],PROFS[prof][1]],()=>{prof=(prof+1)%3;sel>=0?render():radio(["Profil recrutement : je te montre l'essentiel.","Profil design : je te montre la démarche.","Profil dev : je te montre la technique."][prof])},"Profil du visiteur");
+dial(66.5,"MODE",()=>["-60deg","Course","RACE"],()=>radio("Le mode reste sur course. Dans la version finale, ce bouton changera la langue (FR / EN)."),"Mode");
+function radio(t){$("radio").textContent=t}
+function render(){const id=ORD[sel],x=P[id],k=PROFS[prof][0];
+ $("lcd").innerHTML=`<div class="r1"><span>P${sel+1} / 7</span><span>${x.y} · ${PROFS[prof][1]}</span></div><div class="bar" style="background:${x.col}"></div><div class="ti">${x.t.fr}</div><div class="tx">${x[k].fr}</div><button class="ok" type="button" id="ok">OK · OUVRIR ▸</button>`;$("ok").onclick=()=>openProject(id)}
+function select(i){sel=i;document.querySelectorAll(".wheel .b").forEach((b,j)=>b.setAttribute("aria-pressed",String(j===i)));render();leds(2*(i+1)+1);speed=.6+i*.12;
+ const lines=["CEIHM, c'est mon meilleur cas UX : entretien, personas, choix de design. Appuie sur OK.","Spotify : 28 000 titres en vues coordonnées. Ma vue, ce sont les courbes.","Room Guide : la voix pour demander, la réalité augmentée pour montrer.","FluxStock : un SaaS complet, conçu et codé seul. Le parcours scanner-trouver est à une main.","Le sampler : du son dans le navigateur. Monte le volume.","Pac-Man : on rend lisible ce que pense une IA, en temps réel.","Box, box : le mur des stands, mon projet F1, arrive bientôt."];radio(lines[i])}
+$("lcd").innerHTML=`<div class="r1"><span>GARAGE</span><span>PROFIL · DES</span></div><div class="ti">Choisissez un bouton</div><div class="tx">7 projets, 7 boutons. Chaque bouton affiche le projet ici ; OK l'ouvre en démo.</div>`;leds(3);
+addEventListener("keydown",e=>{if(!$("sheet")||$("sheet").hidden){if(/^[1-7]$/.test(e.key))select(+e.key-1);if(e.key==="Enter"&&sel>=0&&!(document.activeElement&&document.activeElement.tagName==="BUTTON"))openProject(ORD[sel]);if(e.key==="p"||e.key==="P"){prof=(prof+1)%3;updProf();sel>=0&&render()}}});
+$("all").onclick=()=>{$("list").hidden=false;$("listX").focus()};$("listX").onclick=()=>$("list").hidden=true;
+$("listOl").innerHTML=ORD.map((id,i)=>`<li><button type="button" data-id="${id}"><b class="disp" style="font-size:24px;width:52px">${CODE[i]}</b><span><b>${P[id].t.fr}</b><br><small style="color:var(--muted)">${P[id].y} · ${P[id].tags.join(", ")}</small></span></button></li>`).join("");
+$("listOl").querySelectorAll("button").forEach(b=>b.onclick=()=>{$("list").hidden=true;openProject(b.dataset.id)});
+
+// pseudo-3D road along the Riviera
+const cv=$("road"),c=cv.getContext("2d");let Wd,H;function size(){const d=Math.min(devicePixelRatio,2);Wd=cv.width=innerWidth*d;H=cv.height=innerHeight*d}addEventListener("resize",size);size();
+const SEG=200,N=300,segs=[];for(let i=0;i<N;i++)segs.push({curve:Math.sin(i/38)*2.2+Math.sin(i/13)*.6,palm:i%7===0});
+let pos=0,last=0,cur=0;
+function proj(z,x,camX,curveOff,hor){const sc=0.9/z;return{x:Wd/2+(x-camX-curveOff)*sc*Wd/2,y:hor+sc*H*.9,w:sc*Wd/2}}
+function frame(t){const dt=Math.min(.05,(t-(last||t))/1000);last=t;cur+=(speed-cur)*Math.min(1,dt*2);if(!RM)pos=(pos+cur*dt*5200)%(SEG*N);
+ const hor=H*.42;const g=c.createLinearGradient(0,0,0,hor);g.addColorStop(0,"#9fcbe8");g.addColorStop(1,"#e5f1f7");c.fillStyle=g;c.fillRect(0,0,Wd,hor+2);
+ // hills + sea
+ c.fillStyle="#b7c6b2";c.beginPath();c.moveTo(Wd*.35,hor);for(let x=.35;x<=1.01;x+=.05)c.lineTo(Wd*x,hor-H*(.05+.04*Math.sin(x*11+1)));c.lineTo(Wd,hor);c.fill();
+ c.fillStyle="#2f7fbf";c.fillRect(0,hor,Wd,H-hor);c.fillStyle="#e2d2a6";c.fillRect(0,hor,Wd,H);
+ const base=Math.floor(pos/SEG),fr=(pos%SEG)/SEG;let dx=0,x=0;const pts=[];
+ for(let n=0;n<120;n++){const s=segs[(base+n)%N];const z=(n+1-fr)*SEG/1000+.2;pts.push({p:proj(z,0,0,x,hor),s,n});x+=dx;dx+=s.curve*.0016}
+ // the sea on the left, a strip of beach, then the promenade
+ c.fillStyle="#2f7fbf";c.fillRect(0,hor,Wd*.5,H*.05);c.fillStyle="#3f8fc9";c.fillRect(0,hor,Wd*.5,H*.012);c.fillStyle="#efdfb4";c.fillRect(0,hor+H*.05,Wd*.5,H*.012);
+ for(let n=pts.length-1;n>0;n--){const a=pts[n].p,b=pts[n-1].p;if(b.y<=a.y)continue;const k=((pts[n].n+base)%2);
+  quad(a.x,a.y,a.w*1.5,b.x,b.y,b.w*1.5,"#d8d3c6");quad(a.x,a.y,a.w*1.15,b.x,b.y,b.w*1.15,k?"#e63b2e":"#ffffff");quad(a.x,a.y,a.w,b.x,b.y,b.w,"#41464f");
+  if(((pts[n].n+base)%4)<2)quad(a.x,a.y,a.w*.03,b.x,b.y,b.w*.03,"#f2f2f2");
+  if(pts[n].s.palm){[1,-1].forEach(sd=>{if(sd<0&&n%2)return;const px=a.x+sd*a.w*2.1,h=a.w*1.6;c.fillStyle="#8c6d48";c.fillRect(px-a.w*.03,a.y-h,a.w*.06,h);c.fillStyle="#5f9a62";for(let f=0;f<6;f++){c.beginPath();c.ellipse(px,a.y-h,a.w*.5,a.w*.1,f/6*Math.PI,0,Math.PI*2);c.fill()}})}}
+ requestAnimationFrame(frame)}
+function quad(x1,y1,w1,x2,y2,w2,col){c.fillStyle=col;c.beginPath();c.moveTo(x1-w1,y1);c.lineTo(x1+w1,y1);c.lineTo(x2+w2,y2);c.lineTo(x2-w2,y2);c.closePath();c.fill()}
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>

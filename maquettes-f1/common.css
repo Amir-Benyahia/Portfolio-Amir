@@ -1,0 +1,23 @@
+:root{--ink:#14161c;--paper:#f6f4ef;--muted:#5d6370;--line:#dcd8cf;--acc:#ff5a36;--acc-ink:#fff;--purple:#8a5cf6;--green:#18a058;--yellow:#f5b800}
+*{box-sizing:border-box}html,body{margin:0;height:100%}
+body{font:15px/1.5 "Instrument Sans",system-ui,sans-serif;color:var(--ink);background:var(--paper);-webkit-font-smoothing:antialiased}
+.disp{font-family:"Big Shoulders Display","Arial Narrow",sans-serif;font-weight:900;letter-spacing:.01em;text-transform:uppercase;line-height:.9}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--acc);outline-offset:3px}
+.mk-tag{position:fixed;left:50%;top:10px;transform:translateX(-50%);z-index:45;background:var(--ink);color:#fff;font-size:12px;padding:5px 12px;border-radius:99px;letter-spacing:.04em}
+.mk-tag a{color:#ffd0c4;margin-left:8px}
+/* project sheet */
+.sheet{position:fixed;inset:0;z-index:50;display:grid;grid-template-columns:minmax(0,1fr) min(420px,100%);background:rgba(20,22,28,.45);backdrop-filter:blur(3px)}
+.sheet[hidden]{display:none}
+.sheet .demo{background:#e9e6df;display:flex;flex-direction:column;min-width:0}
+.sheet .demo header{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;font-size:13px;color:var(--muted)}
+.sheet iframe{flex:1;border:0;background:#fff;margin:0 12px 12px;border-radius:10px}
+.sheet .side{background:var(--paper);padding:22px 24px;overflow:auto}
+.sheet .side .yr{font-size:13px;color:var(--muted)}
+.sheet .side h2{font-size:44px;margin:.3em 0 .2em}
+.sheet .side .bar{height:6px;border-radius:3px;margin:12px 0}
+.sheet .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}.sheet .tags span{border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:13px}
+.sheet .close{float:right;border:1px solid var(--line);background:#fff;border-radius:99px;padding:6px 14px}
+.sheet .soon{display:grid;place-items:center;flex:1;margin:0 12px 12px;border-radius:10px;background:#fff;color:var(--muted);text-align:center;padding:24px}
+@media (max-width:760px){.sheet{grid-template-columns:1fr;grid-template-rows:55% 45%}}
+[hidden]{display:none!important}

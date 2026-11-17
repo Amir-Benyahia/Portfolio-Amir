@@ -10,7 +10,7 @@ const T = {
     claim: "Je conçois des interfaces qu'on comprend du premier coup.",
     facts: "Étudiant en M2 IHM à l'Université Côte d'Azur. Je cherche un <strong>stage UX de 6 mois à partir du 1<sup>er</sup> mars 2027</strong>, à Nice ou Sophia Antipolis.",
     ctaProjects: "Voir les projets", ctaCv: "CV en PDF", skipIntro: "Passer l'intro",
-    gridKicker: "Grille de départ", h2p: "Sept projets, de l'entretien au produit en ligne.",
+    gridKicker: "Grille de départ", h2p: "Huit projets, de l'entretien au produit en ligne.",
     parcKicker: "Parc fermé", h2c: "On en parle ?",
     fAvail: "Disponible", fAvailV: "Du 1er mars au 31 août 2027", fZone: "Zone", fZoneV: "Côte d'Azur, véhiculé", fSchool: "Formation", fSchoolV: "M2 IHM, Université Côte d'Azur",
     mail: "Écrire à amirbenyahia550@gmail.com",
@@ -24,7 +24,7 @@ const T = {
     claim: "I design interfaces people get the first time.",
     facts: "M2 student in Human-Computer Interaction at Université Côte d'Azur. I'm looking for a <strong>6-month UX internship starting 1 March 2027</strong>, in Nice or Sophia Antipolis.",
     ctaProjects: "See the projects", ctaCv: "Résumé (PDF)", skipIntro: "Skip intro",
-    gridKicker: "Starting grid", h2p: "Seven projects, from interviews to shipped product.",
+    gridKicker: "Starting grid", h2p: "Eight projects, from interviews to shipped product.",
     parcKicker: "Parc fermé", h2c: "Let's talk",
     fAvail: "Available", fAvailV: "1 March to 31 August 2027", fZone: "Area", fZoneV: "Côte d'Azur, has a car", fSchool: "Studies", fSchoolV: "M2 HCI, Université Côte d'Azur",
     mail: "Email amirbenyahia550@gmail.com",
@@ -48,7 +48,7 @@ function applyLang() {
 $("#lang").addEventListener("click", () => { L = L === "fr" ? "en" : "fr"; try { localStorage.setItem("ab-lang", L); } catch (e) {} applyLang(); });
 
 /* ---------- projects ---------- */
-const ORDER = ["ceihm", "dz", "flux", "room", "spotify", "maze", "sampler"];
+const ORDER = ["ceihm", "comclick", "dz", "flux", "room", "spotify", "maze", "sampler"];
 function renderRail() {
   $("#rail").innerHTML = ORDER.map((id) => {
     const x = P[id];
@@ -60,7 +60,7 @@ function renderRail() {
       <figure class="shot" data-open="${id}" aria-hidden="true"><img src="img/${id}.webp" srcset="img/${id}-s.webp 800w, img/${id}.webp 1600w" sizes="(min-width:900px) 50vw, 100vw" alt="" loading="lazy" decoding="async" width="1600" height="1000"></figure>
       <div class="info">
         <p class="pos" aria-hidden="true"><small>P</small>${pos}</p>
-        <p class="yr">${x.y}${x.award ? ` <strong class="award">${x.award[L]}</strong>` : ""}</p>
+        <p class="yr">${x.y}${x.award ? ` <strong class="award">${x.award[L]}</strong>` : ""}${x.wip ? ` <strong class="wip">${x.wip[L]}</strong>` : ""}</p>
         <h3>${x.t[L]}</h3>
         <p class="rh">${x.rh[L]}</p>
         <p class="ds">${x.design[L]}</p>
@@ -76,7 +76,7 @@ let back = null;
 function openProject(id, from) {
   const x = P[id];
   back = from;
-  $("#shY").textContent = x.award ? `${x.y} · ${x.award[L]}` : x.y;
+  $("#shY").textContent = [x.y, x.award?.[L], x.wip?.[L]].filter(Boolean).join(" · ");
   $("#shT").textContent = x.t[L];
   $("#shRh").textContent = x.rh[L];
   $("#shDesign").textContent = x.design[L];
@@ -88,8 +88,9 @@ function openProject(id, from) {
   if (x.repo) links.push(`<a href="${x.repo}" target="_blank" rel="noopener">${t("repo")}</a>`);
   if (x.video) links.push(`<a href="${x.video}" target="_blank" rel="noopener">${t("video")}</a>`);
   $("#shLinks").innerHTML = links.join("");
-  $("#shFrame").innerHTML = `<iframe src="${x.live}" title="${t("live")} : ${x.t[L]}"></iframe>`;
-  $("#shTab").href = `${x.live}`;
+  const src = x.langParam ? `${x.live}?lang=${L}` : x.live;
+  $("#shFrame").innerHTML = `<iframe src="${src}" title="${t("live")} : ${x.t[L]}"></iframe>`;
+  $("#shTab").href = src;
   $("#sheet").hidden = false;
   document.body.style.overflow = "hidden";
   $("#shClose").focus();

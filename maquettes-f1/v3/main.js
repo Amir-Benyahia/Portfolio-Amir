@@ -162,6 +162,23 @@ rail.addEventListener("focusin", (e) => {
   scrollTo({ top, behavior: reduce ? "auto" : "smooth" });
 });
 
+/* ---------- fit the name to the width (font size is capped by height) ---------- */
+let restW = 88;
+function fitName() {
+  const name = $("#name"), l2 = name.querySelector(".l2");
+  const avail = name.clientWidth - parseFloat(getComputedStyle(l2).paddingLeft);
+  let w = 88;
+  for (let k = 0; k < 3; k++) {
+    name.style.setProperty("--w", w);
+    const range = document.createRange(); range.selectNodeContents(l2);
+    const tw = range.getBoundingClientRect().width;
+    w = Math.max(60, Math.min(150, w * (avail * 0.97) / tw));
+  }
+  restW = Math.round(w);
+  name.style.setProperty("--w", restW);
+}
+addEventListener("resize", fitName);
+
 /* ---------- intro: lights out, then the name goes past ---------- */
 function intro() {
   const html = document.documentElement;
@@ -190,7 +207,7 @@ function intro() {
       spans.forEach((s, i) => {
         const k = Math.min(1, Math.max(0, (now - t0 - i * 110) / D)), e = easeOut(k);
         const x = (1 - e) * -130; // vw
-        const w = 150 - (150 - 88) * e;
+        const w = 150 - (150 - restW) * e;
         const skew = (1 - e) * -16;
         const b = (1 - e) * 26;
         s.style.transform = `translateX(${x}vw) skewX(${skew}deg)`;
@@ -209,5 +226,5 @@ function intro() {
 
 /* ---------- boot ---------- */
 applyLang();
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { layout(); intro(); }); else intro();
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { fitName(); layout(); intro(); }); else intro();
 })();

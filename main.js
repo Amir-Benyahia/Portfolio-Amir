@@ -10,7 +10,7 @@ const T = {
     claim: "Je conçois des interfaces qu'on comprend du premier coup.",
     facts: "Étudiant en M2 IHM à l'Université Côte d'Azur. Je cherche un <strong>stage UX de 6 mois à partir du 1<sup>er</sup> mars 2027</strong>, à Nice ou Sophia Antipolis.",
     ctaProjects: "Voir les projets", ctaCv: "CV en PDF", skipIntro: "Passer l'intro",
-    gridKicker: "Grille de départ", h2p: "Huit projets, de l'entretien au produit en ligne.",
+    gridKicker: "Grille de départ", h2p: "Neuf projets, de l'entretien au produit en ligne.",
     parcKicker: "Parc fermé", h2c: "On en parle ?",
     fAvail: "Disponible", fAvailV: "Du 1er mars au 31 août 2027", fZone: "Zone", fZoneV: "Côte d'Azur, véhiculé", fSchool: "Formation", fSchoolV: "M2 IHM, Université Côte d'Azur",
     mail: "Écrire à amirbenyahia550@gmail.com",
@@ -24,7 +24,7 @@ const T = {
     claim: "I design interfaces people get the first time.",
     facts: "M2 student in Human-Computer Interaction at Université Côte d'Azur. I'm looking for a <strong>6-month UX internship starting 1 March 2027</strong>, in Nice or Sophia Antipolis.",
     ctaProjects: "See the projects", ctaCv: "Résumé (PDF)", skipIntro: "Skip intro",
-    gridKicker: "Starting grid", h2p: "Eight projects, from interviews to shipped product.",
+    gridKicker: "Starting grid", h2p: "Nine projects, from interviews to shipped product.",
     parcKicker: "Parc fermé", h2c: "Let's talk",
     fAvail: "Available", fAvailV: "1 March to 31 August 2027", fZone: "Area", fZoneV: "Côte d'Azur, has a car", fSchool: "Studies", fSchoolV: "M2 HCI, Université Côte d'Azur",
     mail: "Email amirbenyahia550@gmail.com",
@@ -48,7 +48,7 @@ function applyLang() {
 $("#lang").addEventListener("click", () => { L = L === "fr" ? "en" : "fr"; try { localStorage.setItem("ab-lang", L); } catch (e) {} applyLang(); });
 
 /* ---------- projects ---------- */
-const ORDER = ["ceihm", "comclick", "dz", "flux", "room", "spotify", "maze", "sampler"];
+const ORDER = ["ceihm", "comclick", "dz", "wam", "flux", "room", "spotify", "maze", "sampler"];
 function renderRail() {
   $("#rail").innerHTML = ORDER.map((id) => {
     const x = P[id];
